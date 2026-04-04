@@ -1,9 +1,13 @@
 export const SECTIONS = ["home", "about", "skills", "projects", "contact"];
 
 export const SITE_ASSETS = {
-  idleGif:
-    "https://i.pinimg.com/originals/ab/0f/af/ab0fafe8753a97c199a10b353ec6a8bb.gif",
-  runGif: "/running.gif",
+  character: {
+    idle: "/assets/idle.gif",
+    jump: "/assets/jump.gif",
+    crouch: "/assets/crouch.gif",
+    attack: "/assets/eattack.gif",
+    run: "/assets/run.gif",
+  },
   heroProfile:
     "https://i.pinimg.com/736x/65/40/ec/6540eccd704245ae4d8a01874186887f.jpg",
   sectionBackgrounds: [

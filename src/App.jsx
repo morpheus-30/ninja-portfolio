@@ -12,6 +12,18 @@ import {
 } from "./siteData";
 import { C, F, MOTION } from "./theme";
 
+const CHARACTER_ACTIONS = {
+  idle: { src: SITE_ASSETS.character.idle },
+  run: { src: SITE_ASSETS.character.run },
+  jump: { src: SITE_ASSETS.character.jump },
+  crouch: { src: SITE_ASSETS.character.crouch },
+  attack: { src: SITE_ASSETS.character.attack },
+};
+
+const SECTION_POINTS = SECTIONS.map(
+  (_, index) => 10 + (index / (SECTIONS.length - 1)) * 80
+);
+
 function ThreeScene({ sectionIndex }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -158,34 +170,44 @@ function ThreeScene({ sectionIndex }) {
   return <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />;
 }
 
-function NarutoWalker({ isRunning, direction }) {
+function NarutoWalker({ action, direction, isMobile }) {
+  const actionConfig = CHARACTER_ACTIONS[action] ?? CHARACTER_ACTIONS.idle;
+  const frameWidth = isMobile ? 150 : 210;
+  const frameHeight = isMobile ? 118 : 200;
+  const spriteHeight =
+    action === "jump" ? (isMobile ? 114 : 200) : isMobile ? 102 : 146;
+
   return (
     <div
       style={{
-        width: isRunning ? "182px" : "164px",
-        height: isRunning ? "150px" : "164px",
+        width: `${frameWidth}px`,
+        height: `${frameHeight}px`,
         overflow: "hidden",
         position: "relative",
         display: "block",
         transition: "width 160ms ease, height 160ms ease",
-        }}
-      >
+      }}
+    >
       <img
-        src={isRunning ? SITE_ASSETS.runGif : SITE_ASSETS.idleGif}
+        src={actionConfig.src}
         alt="Naruto runner"
         style={{
           position: "absolute",
-          width: isRunning ? "360px" : "164px",
-          height: "auto",
-          left: isRunning ? "-92px" : "0",
-          top: isRunning ? "-38px" : "0",
+          height: `${spriteHeight}px`,
+          width: "auto",
+          left: "50%",
+          bottom: 0,
           display: "block",
-          transform: direction === "left" ? "scaleX(-1)" : "scaleX(1)",
+          transform:
+            direction === "left"
+              ? "translateX(-50%) scaleX(-1)"
+              : "translateX(-50%) scaleX(1)",
           transformOrigin: "center center",
-          mixBlendMode: isRunning ? "normal" : "multiply",
-          filter: isRunning
-            ? "drop-shadow(0 10px 18px rgba(0,0,0,0.62)) drop-shadow(0 0 14px rgba(216,90,26,0.28))"
-            : "drop-shadow(0 10px 18px rgba(0,0,0,0.55)) drop-shadow(0 0 14px rgba(216,90,26,0.3)) saturate(1.05) contrast(1.04)",
+          mixBlendMode: action === "idle" ? "multiply" : "normal",
+          filter:
+            action === "run"
+              ? "drop-shadow(0 10px 18px rgba(0,0,0,0.62)) drop-shadow(0 0 14px rgba(216,90,26,0.28))"
+              : "drop-shadow(0 10px 18px rgba(0,0,0,0.55)) drop-shadow(0 0 14px rgba(216,90,26,0.3)) saturate(1.05) contrast(1.04)",
           userSelect: "none",
           WebkitUserDrag: "none",
         }}
@@ -194,15 +216,17 @@ function NarutoWalker({ isRunning, direction }) {
   );
 }
 
-function SectionShell({ title, kicker, children }) {
+function SectionShell({ title, kicker, children, isMobile }) {
   return (
     <section
       style={{
-        width: "min(1120px, calc(100vw - 2.5rem))",
-        minHeight: "min(70vh, 760px)",
-        padding: "clamp(1.6rem, 2vw, 2.2rem)",
+        width: isMobile
+          ? "calc(100vw - 1rem)"
+          : "min(1120px, calc(100vw - 2.5rem))",
+        minHeight: isMobile ? "auto" : "min(70vh, 760px)",
+        padding: isMobile ? "1rem" : "clamp(1.6rem, 2vw, 2.2rem)",
         border: `2px solid rgba(125, 75, 28, 0.72)`,
-        borderRadius: "18px 42px 18px 42px",
+        borderRadius: isMobile ? "14px 24px 14px 24px" : "18px 42px 18px 42px",
         background:
           "linear-gradient(180deg, rgba(66,34,18,0.88) 0%, rgba(34,18,10,0.94) 100%)",
         boxShadow:
@@ -211,8 +235,9 @@ function SectionShell({ title, kicker, children }) {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        clipPath:
-          "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
+        clipPath: isMobile
+          ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
+          : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
       }}
     >
       <div
@@ -251,10 +276,12 @@ function SectionShell({ title, kicker, children }) {
         <h2
           style={{
             fontFamily: F.display,
-            fontSize: "clamp(2.4rem, 5vw, 4.8rem)",
-            lineHeight: 0.95,
+            fontSize: isMobile
+              ? "clamp(1.9rem, 11vw, 3rem)"
+              : "clamp(2.4rem, 5vw, 4.8rem)",
+            lineHeight: isMobile ? 1 : 0.95,
             color: C.text,
-            marginBottom: "1.25rem",
+            marginBottom: isMobile ? "0.9rem" : "1.25rem",
             textTransform: "uppercase",
             letterSpacing: "0.04em",
           }}
@@ -394,9 +421,12 @@ function MissionCard({ rank, title, desc, tags }) {
 
 export default function Portfolio() {
   const initialSpriteX = 10;
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
   const [sectionIdx, setSectionIdx] = useState(0);
   const [displayIdx, setDisplayIdx] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
+  const [characterAction, setCharacterAction] = useState("idle");
   const [direction, setDirection] = useState("right");
   const [spriteX, setSpriteX] = useState(initialSpriteX);
   const [visible, setVisible] = useState(true);
@@ -405,11 +435,14 @@ export default function Portfolio() {
 
   const sectionRef = useRef(0);
   const runningTimerRef = useRef(null);
+  const actionTimerRef = useRef(null);
   const swapTimerRef = useRef(null);
   const lockRef = useRef(false);
   const touchStartRef = useRef(null);
   const spriteXRef = useRef(initialSpriteX);
   const contactFormRef = useRef(null);
+  const pressedKeysRef = useRef(new Set());
+  const isMobile = viewportWidth < 768;
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -426,7 +459,7 @@ export default function Portfolio() {
     const nextX = 10 + (nextIdx / (SECTIONS.length - 1)) * 80;
 
     setDirection(nextX >= currentX ? "right" : "left");
-    setIsRunning(true);
+    setCharacterAction("run");
     setSpriteX(nextX);
     spriteXRef.current = nextX;
     setVisible(false);
@@ -437,7 +470,12 @@ export default function Portfolio() {
     window.clearTimeout(swapTimerRef.current);
 
     runningTimerRef.current = window.setTimeout(() => {
-      setIsRunning(false);
+      if (
+        !pressedKeysRef.current.has("a") &&
+        !pressedKeysRef.current.has("d")
+      ) {
+        setCharacterAction("idle");
+      }
     }, MOTION.runDurationMs);
 
     swapTimerRef.current = window.setTimeout(() => {
@@ -451,6 +489,8 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth);
+
     const onWheel = (event) => {
       event.preventDefault();
       if (Math.abs(event.deltaY) < 18) return;
@@ -481,60 +521,167 @@ export default function Portfolio() {
       touchStartRef.current = null;
     };
 
+    window.addEventListener("resize", onResize);
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
 
     return () => {
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       window.clearTimeout(runningTimerRef.current);
+      window.clearTimeout(actionTimerRef.current);
       window.clearTimeout(swapTimerRef.current);
     };
   }, [triggerTransition]);
 
-  const handleContactSubmit = useCallback(async (event) => {
-    event.preventDefault();
-    const form = contactFormRef.current;
-    if (!form || contactState === "loading") return;
+  useEffect(() => {
+    const closestSectionIndex = () => {
+      let closestIndex = 0;
+      let closestDistance = Infinity;
 
-    setContactState("loading");
-    setContactMessage("Shadow clone dispatch in progress...");
-
-    try {
-      const formData = new FormData(form);
-      const response = await fetch(
-        "https://formsubmit.co/ajax/nakshatrachandna7@gmail.com",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-          },
-          body: formData,
+      SECTION_POINTS.forEach((point, index) => {
+        const distance = Math.abs(spriteXRef.current - point);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
         }
+      });
+
+      return closestIndex;
+    };
+
+    const endTransientAction = () => {
+      const keys = pressedKeysRef.current;
+      if (keys.has("s")) {
+        setCharacterAction("crouch");
+      } else {
+        setCharacterAction("idle");
+      }
+    };
+
+    const moveToSectionPoint = (step) => {
+      if (characterAction === "jump") return;
+
+      const currentIndex = closestSectionIndex();
+      const nextIndex = Math.max(
+        0,
+        Math.min(SECTIONS.length - 1, currentIndex + step)
       );
 
-      const result = await response.json();
+      if (nextIndex === currentIndex) return;
 
-      if (!response.ok || result.success === false) {
-        throw new Error(result.message || "Unable to send message.");
+      triggerTransition(nextIndex);
+    };
+
+    const onActionKeyDown = (event) => {
+      const key = event.key.toLowerCase();
+      if (!["w", "a", "s", "d", "e"].includes(key)) return;
+
+      if (["w", "a", "s", "d"].includes(key)) {
+        event.preventDefault();
       }
 
-      form.reset();
-      setContactState("success");
-      setContactMessage(
-        "Mission scroll delivered. Nakshatra-kun will receive your message by email."
-      );
-    } catch (error) {
-      setContactState("error");
-      setContactMessage(
-        error.message || "Transmission failed. Try again in a moment."
-      );
-    }
-  }, [contactState]);
+      pressedKeysRef.current.add(key);
+      window.clearTimeout(actionTimerRef.current);
+
+      if (key === "a") {
+        moveToSectionPoint(-1);
+      } else if (key === "d") {
+        moveToSectionPoint(1);
+      } else if (key === "s") {
+        setCharacterAction("crouch");
+      } else if (key === "w") {
+        setCharacterAction("jump");
+        actionTimerRef.current = window.setTimeout(endTransientAction, 520);
+      } else if (key === "e") {
+        setCharacterAction("attack");
+        actionTimerRef.current = window.setTimeout(endTransientAction, 420);
+      }
+    };
+
+    const onActionKeyUp = (event) => {
+      const key = event.key.toLowerCase();
+      if (!["w", "a", "s", "d", "e"].includes(key)) return;
+      pressedKeysRef.current.delete(key);
+
+      if (
+        key === "s" &&
+        !pressedKeysRef.current.has("w") &&
+        !pressedKeysRef.current.has("e")
+      ) {
+        setCharacterAction("idle");
+      }
+
+      if (
+        (key === "a" || key === "d") &&
+        !pressedKeysRef.current.has("a") &&
+        !pressedKeysRef.current.has("d")
+      ) {
+        if (
+          !pressedKeysRef.current.has("w") &&
+          !pressedKeysRef.current.has("s") &&
+          !pressedKeysRef.current.has("e")
+        ) {
+          setCharacterAction("idle");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onActionKeyDown);
+    window.addEventListener("keyup", onActionKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onActionKeyDown);
+      window.removeEventListener("keyup", onActionKeyUp);
+    };
+  }, [characterAction, triggerTransition]);
+
+  const handleContactSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      const form = contactFormRef.current;
+      if (!form || contactState === "loading") return;
+
+      setContactState("loading");
+      setContactMessage("Shadow clone dispatch in progress...");
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch(
+          "https://formsubmit.co/ajax/nakshatrachandna7@gmail.com",
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+            },
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || result.success === false) {
+          throw new Error(result.message || "Unable to send message.");
+        }
+
+        form.reset();
+        setContactState("success");
+        setContactMessage(
+          "Mission scroll delivered. Nakshatra-kun will receive your message by email."
+        );
+      } catch (error) {
+        setContactState("error");
+        setContactMessage(
+          error.message || "Transmission failed. Try again in a moment."
+        );
+      }
+    },
+    [contactState]
+  );
 
   return (
     <div
@@ -614,26 +761,29 @@ export default function Portfolio() {
       <nav
         style={{
           position: "fixed",
-          top: "1.2rem",
+          top: isMobile ? "0.55rem" : "1.2rem",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "min(1120px, calc(100vw - 1.5rem))",
+          width: isMobile
+            ? "calc(100vw - 0.75rem)"
+            : "min(1120px, calc(100vw - 1.5rem))",
           zIndex: 30,
-          padding: "0.75rem 1rem",
-          borderRadius: "999px",
+          padding: isMobile ? "0.55rem 0.6rem" : "0.75rem 1rem",
+          borderRadius: isMobile ? "18px" : "999px",
           border: `1px solid ${C.line}`,
           background: C.smoke,
           backdropFilter: "blur(14px)",
           display: "flex",
+          flexDirection: isMobile ? "column" : "row",
           justifyContent: "space-between",
           alignItems: "center",
-          gap: "1rem",
+          gap: isMobile ? "0.45rem" : "1rem",
         }}
       >
         <div
           style={{
             fontFamily: F.display,
-            fontSize: "1.5rem",
+            fontSize: isMobile ? "1.15rem" : "1.5rem",
             letterSpacing: "0.12em",
             color: C.gold,
           }}
@@ -644,8 +794,12 @@ export default function Portfolio() {
           style={{
             display: "flex",
             gap: "0.35rem",
-            flexWrap: "wrap",
-            justifyContent: "flex-end",
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            justifyContent: isMobile ? "flex-start" : "flex-end",
+            width: isMobile ? "100%" : "auto",
+            overflowX: isMobile ? "auto" : "visible",
+            paddingBottom: isMobile ? "0.1rem" : 0,
+            scrollbarWidth: "none",
           }}
         >
           {SECTIONS.map((section, idx) => (
@@ -660,11 +814,13 @@ export default function Portfolio() {
                 background:
                   idx === sectionIdx ? "rgba(239,197,108,0.12)" : "transparent",
                 color: idx === sectionIdx ? C.text : C.muted,
-                padding: "0.45rem 0.9rem",
+                padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.12em",
                 cursor: "pointer",
                 fontFamily: F.display,
+                whiteSpace: "nowrap",
+                fontSize: isMobile ? "0.82rem" : "1rem",
               }}
             >
               {section}
@@ -681,19 +837,25 @@ export default function Portfolio() {
           height: "100%",
           display: "grid",
           placeItems: "center",
-          padding: "5.8rem 0.9rem 8.8rem",
+          padding: isMobile ? "5rem 0.5rem 6rem" : "5.8rem 0.9rem 8.8rem",
           opacity: visible ? 1 : 0,
           transform: visible ? "scale(1)" : "scale(0.985)",
           transition: "opacity 320ms ease, transform 320ms ease",
         }}
       >
         {displayIdx === 0 && (
-          <SectionShell title={HOME_CONTENT.title} kicker={HOME_CONTENT.kicker}>
+          <SectionShell
+            title={HOME_CONTENT.title}
+            kicker={HOME_CONTENT.kicker}
+            isMobile={isMobile}
+          >
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
-                gap: "1.6rem",
+                gridTemplateColumns: isMobile
+                  ? "minmax(0, 1fr)"
+                  : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
+                gap: isMobile ? "1rem" : "1.6rem",
                 alignItems: "center",
               }}
             >
@@ -703,6 +865,7 @@ export default function Portfolio() {
                     fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
                     color: C.sand,
                     marginBottom: "0.8rem",
+                    lineHeight: 1.5,
                   }}
                 >
                   {HOME_CONTENT.intro}
@@ -718,6 +881,7 @@ export default function Portfolio() {
                         index === HOME_CONTENT.paragraphs.length - 1
                           ? "1.4rem"
                           : "1rem",
+                      fontSize: isMobile ? "0.96rem" : "1rem",
                     }}
                   >
                     {paragraph}
@@ -753,7 +917,7 @@ export default function Portfolio() {
               <div
                 style={{
                   justifySelf: "center",
-                  width: "min(100%, 290px)",
+                  width: isMobile ? "min(100%, 220px)" : "min(100%, 290px)",
                   aspectRatio: "4 / 5",
                   borderRadius: "28px",
                   overflow: "hidden",
@@ -780,7 +944,11 @@ export default function Portfolio() {
         )}
 
         {displayIdx === 1 && (
-          <SectionShell title="Ninja Profile" kicker="Character Sheet">
+          <SectionShell
+            title="Ninja Profile"
+            kicker="Character Sheet"
+            isMobile={isMobile}
+          >
             <div
               style={{
                 display: "grid",
@@ -807,7 +975,11 @@ export default function Portfolio() {
         )}
 
         {displayIdx === 2 && (
-          <SectionShell title="Jutsu Arsenal" kicker="Power Levels">
+          <SectionShell
+            title="Jutsu Arsenal"
+            kicker="Power Levels"
+            isMobile={isMobile}
+          >
             <div
               style={{
                 display: "grid",
@@ -816,37 +988,43 @@ export default function Portfolio() {
               }}
             >
               {SKILL_GROUPS.map((group) => (
-              <div key={group.title}>
-                <p
-                  style={{
-                    color: C.gold,
-                    marginBottom: "0.9rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.18em",
-                  }}
-                >
-                  {group.title}
-                </p>
-                {group.skills.map((skill) => (
-                  <SkillBar
-                    key={skill.label}
-                    label={skill.label}
-                    value={skill.value}
-                    color={skill.color}
-                  />
-                ))}
-              </div>
+                <div key={group.title}>
+                  <p
+                    style={{
+                      color: C.gold,
+                      marginBottom: "0.9rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.18em",
+                    }}
+                  >
+                    {group.title}
+                  </p>
+                  {group.skills.map((skill) => (
+                    <SkillBar
+                      key={skill.label}
+                      label={skill.label}
+                      value={skill.value}
+                      color={skill.color}
+                    />
+                  ))}
+                </div>
               ))}
             </div>
           </SectionShell>
         )}
 
         {displayIdx === 3 && (
-          <SectionShell title="Mission Board" kicker="Recent Arcs">
+          <SectionShell
+            title="Mission Board"
+            kicker="Recent Arcs"
+            isMobile={isMobile}
+          >
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                gridTemplateColumns: isMobile
+                  ? "1fr"
+                  : "repeat(auto-fit, minmax(250px, 1fr))",
                 gap: "1rem",
               }}
             >
@@ -861,6 +1039,7 @@ export default function Portfolio() {
           <SectionShell
             title={CONTACT_CONTENT.title}
             kicker={CONTACT_CONTENT.kicker}
+            isMobile={isMobile}
           >
             <form
               ref={contactFormRef}
@@ -874,7 +1053,13 @@ export default function Portfolio() {
               />
               <input type="hidden" name="_template" value="table" />
               <input type="hidden" name="_captcha" value="false" />
-              <input type="text" name="_honey" style={{ display: "none" }} tabIndex="-1" autoComplete="off" />
+              <input
+                type="text"
+                name="_honey"
+                style={{ display: "none" }}
+                tabIndex="-1"
+                autoComplete="off"
+              />
               <input
                 type="text"
                 name="name"
@@ -942,15 +1127,15 @@ export default function Portfolio() {
                       contactState === "success"
                         ? "rgba(239,197,108,0.4)"
                         : contactState === "error"
-                          ? "rgba(157,44,18,0.65)"
-                          : "rgba(125,75,28,0.8)"
+                        ? "rgba(157,44,18,0.65)"
+                        : "rgba(125,75,28,0.8)"
                     }`,
                     background:
                       contactState === "success"
                         ? "linear-gradient(180deg, rgba(76,58,20,0.75) 0%, rgba(48,31,12,0.9) 100%)"
                         : contactState === "error"
-                          ? "linear-gradient(180deg, rgba(89,26,16,0.75) 0%, rgba(52,18,12,0.9) 100%)"
-                          : "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+                        ? "linear-gradient(180deg, rgba(89,26,16,0.75) 0%, rgba(52,18,12,0.9) 100%)"
+                        : "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
                     color: contactState === "error" ? "#ffd7c9" : C.sand,
                     lineHeight: 1.6,
                   }}
@@ -966,8 +1151,8 @@ export default function Portfolio() {
                     {contactState === "success"
                       ? "Mission Complete"
                       : contactState === "error"
-                        ? "Transmission Failed"
-                        : "Shadow Clone Jutsu"}
+                      ? "Transmission Failed"
+                      : "Shadow Clone Jutsu"}
                   </div>
                   <div style={{ fontSize: "0.92rem" }}>{contactMessage}</div>
                 </div>
@@ -994,7 +1179,7 @@ export default function Portfolio() {
           left: 0,
           right: 0,
           bottom: 0,
-          height: "138px",
+          height: isMobile ? "104px" : "138px",
           zIndex: 25,
           pointerEvents: "none",
         }}
@@ -1002,8 +1187,8 @@ export default function Portfolio() {
         <div
           style={{
             position: "absolute",
-            inset: "auto 0 18px 0",
-            height: "22px",
+            inset: isMobile ? "auto 0 12px 0" : "auto 0 18px 0",
+            height: isMobile ? "16px" : "22px",
             background:
               "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.4), rgba(216,90,26,0.52), rgba(239,197,108,0.4), rgba(0,0,0,0))",
             boxShadow: "0 0 28px rgba(216,90,26,0.2)",
@@ -1013,9 +1198,9 @@ export default function Portfolio() {
           style={{
             position: "absolute",
             left: `${spriteX}%`,
-            bottom: "18px",
-            width: isRunning ? "132px" : "110px",
-            height: "28px",
+            bottom: isMobile ? "12px" : "18px",
+            width: isMobile ? "78px" : "110px",
+            height: isMobile ? "18px" : "28px",
             transform: "translateX(-50%)",
             transition:
               "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1), width 160ms ease",
@@ -1027,12 +1212,16 @@ export default function Portfolio() {
           style={{
             position: "absolute",
             left: `${spriteX}%`,
-            bottom: isRunning ? "42px" : "5px",
+            bottom: isMobile ? "8px" : "12px",
             transform: "translateX(-50%)",
             transition: "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1)",
           }}
         >
-          <NarutoWalker isRunning={isRunning} direction={direction} />
+          <NarutoWalker
+            action={characterAction}
+            direction={direction}
+            isMobile={isMobile}
+          />
         </div>
       </div>
     </div>
