@@ -497,16 +497,16 @@ export default function Portfolio() {
       triggerTransition(sectionRef.current + (event.deltaY > 0 ? 1 : -1));
     };
 
-    const onKeyDown = (event) => {
-      if (["ArrowDown", "PageDown", " ", "j"].includes(event.key)) {
-        event.preventDefault();
-        triggerTransition(sectionRef.current + 1);
-      }
-      if (["ArrowUp", "PageUp", "k"].includes(event.key)) {
-        event.preventDefault();
-        triggerTransition(sectionRef.current - 1);
-      }
-    };
+    // const onKeyDown = (event) => {
+    //   if (["ArrowDown", "PageDown", " ", "j"].includes(event.key)) {
+    //     event.preventDefault();
+    //     triggerTransition(sectionRef.current + 1);
+    //   }
+    //   if (["ArrowUp", "PageUp", "k"].includes(event.key)) {
+    //     event.preventDefault();
+    //     triggerTransition(sectionRef.current - 1);
+    //   }
+    // };
 
     const onTouchStart = (event) => {
       touchStartRef.current = event.touches[0].clientY;
@@ -523,14 +523,14 @@ export default function Portfolio() {
 
     window.addEventListener("resize", onResize);
     window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("keydown", onKeyDown);
+    // window.addEventListener("keydown", onKeyDown);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("keydown", onKeyDown);
+      // window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       window.clearTimeout(runningTimerRef.current);
