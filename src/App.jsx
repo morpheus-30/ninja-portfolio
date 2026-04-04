@@ -221,9 +221,10 @@ function SectionShell({ title, kicker, children, isMobile }) {
     <section
       style={{
         width: isMobile
-          ? "calc(100vw - 1rem)"
+          ? "calc(100vw - 1.5rem)"
           : "min(1120px, calc(100vw - 2.5rem))",
-        minHeight: isMobile ? "auto" : "min(70vh, 760px)",
+        minHeight: isMobile ? "calc(100vh - 7.5rem)" : "min(70vh, 760px)",
+        maxHeight: isMobile ? "calc(100vh - 7.5rem)" : "none",
         padding: isMobile ? "1rem" : "clamp(1.6rem, 2vw, 2.2rem)",
         border: `2px solid rgba(125, 75, 28, 0.72)`,
         borderRadius: isMobile ? "14px 24px 14px 24px" : "18px 42px 18px 42px",
@@ -234,7 +235,11 @@ function SectionShell({ title, kicker, children, isMobile }) {
         display: "grid",
         alignItems: "center",
         position: "relative",
-        overflow: "hidden",
+        overflowX: "hidden",
+        overflowY: isMobile ? "auto" : "hidden",
+        WebkitOverflowScrolling: isMobile ? "touch" : "auto",
+        overscrollBehavior: isMobile ? "contain" : "auto",
+        touchAction: isMobile ? "pan-y" : "auto",
         clipPath: isMobile
           ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
           : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
@@ -260,7 +265,14 @@ function SectionShell({ title, kicker, children, isMobile }) {
           pointerEvents: "none",
         }}
       />
-      <div>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          overflow: "visible",
+          paddingRight: isMobile ? "0.2rem" : 0,
+        }}
+      >
         <p
           style={{
             color: C.gold,
@@ -509,15 +521,26 @@ export default function Portfolio() {
     // };
 
     const onTouchStart = (event) => {
-      touchStartRef.current = event.touches[0].clientY;
+      touchStartRef.current = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
     };
 
     const onTouchEnd = (event) => {
       if (touchStartRef.current == null) return;
-      const delta = touchStartRef.current - event.changedTouches[0].clientY;
-      if (Math.abs(delta) > 36) {
-        triggerTransition(sectionRef.current + (delta > 0 ? 1 : -1));
+
+      const deltaX = touchStartRef.current.x - event.changedTouches[0].clientX;
+      const deltaY = touchStartRef.current.y - event.changedTouches[0].clientY;
+
+      if (
+        isMobile &&
+        Math.abs(deltaX) > 40 &&
+        Math.abs(deltaX) > Math.abs(deltaY)
+      ) {
+        triggerTransition(sectionRef.current + (deltaX > 0 ? 1 : -1));
       }
+
       touchStartRef.current = null;
     };
 
@@ -537,7 +560,7 @@ export default function Portfolio() {
       window.clearTimeout(actionTimerRef.current);
       window.clearTimeout(swapTimerRef.current);
     };
-  }, [triggerTransition]);
+  }, [isMobile, triggerTransition]);
 
   useEffect(() => {
     const closestSectionIndex = () => {
@@ -836,11 +859,12 @@ export default function Portfolio() {
           width: "100%",
           height: "100%",
           display: "grid",
-          placeItems: "center",
-          padding: isMobile ? "5rem 0.5rem 6rem" : "5.8rem 0.9rem 8.8rem",
+          placeItems: isMobile ? "start center" : "center",
+          padding: isMobile ? "5.85rem 0.75rem 1.25rem" : "5.8rem 0.9rem 8.8rem",
           opacity: visible ? 1 : 0,
           transform: visible ? "scale(1)" : "scale(0.985)",
           transition: "opacity 320ms ease, transform 320ms ease",
+          overflow: "hidden",
         }}
       >
         {displayIdx === 0 && (
@@ -1173,13 +1197,14 @@ export default function Portfolio() {
         )}
       </main>
 
+      {!isMobile && (
       <div
         style={{
           position: "fixed",
           left: 0,
           right: 0,
           bottom: 0,
-          height: isMobile ? "104px" : "138px",
+          height: "138px",
           zIndex: 25,
           pointerEvents: "none",
         }}
@@ -1224,6 +1249,7 @@ export default function Portfolio() {
           />
         </div>
       </div>
+      )}
     </div>
   );
 }
