@@ -400,6 +400,8 @@ export default function Portfolio() {
   const [direction, setDirection] = useState("right");
   const [spriteX, setSpriteX] = useState(initialSpriteX);
   const [visible, setVisible] = useState(true);
+  const [contactState, setContactState] = useState("idle");
+  const [contactMessage, setContactMessage] = useState("");
 
   const sectionRef = useRef(0);
   const runningTimerRef = useRef(null);
@@ -407,6 +409,7 @@ export default function Portfolio() {
   const lockRef = useRef(false);
   const touchStartRef = useRef(null);
   const spriteXRef = useRef(initialSpriteX);
+  const contactFormRef = useRef(null);
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -492,6 +495,46 @@ export default function Portfolio() {
       window.clearTimeout(swapTimerRef.current);
     };
   }, [triggerTransition]);
+
+  const handleContactSubmit = useCallback(async (event) => {
+    event.preventDefault();
+    const form = contactFormRef.current;
+    if (!form || contactState === "loading") return;
+
+    setContactState("loading");
+    setContactMessage("Shadow clone dispatch in progress...");
+
+    try {
+      const formData = new FormData(form);
+      const response = await fetch(
+        "https://formsubmit.co/ajax/nakshatrachandna7@gmail.com",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || "Unable to send message.");
+      }
+
+      form.reset();
+      setContactState("success");
+      setContactMessage(
+        "Mission scroll delivered. Nakshatra-kun will receive your message by email."
+      );
+    } catch (error) {
+      setContactState("error");
+      setContactMessage(
+        error.message || "Transmission failed. Try again in a moment."
+      );
+    }
+  }, [contactState]);
 
   return (
     <div
@@ -819,10 +862,24 @@ export default function Portfolio() {
             title={CONTACT_CONTENT.title}
             kicker={CONTACT_CONTENT.kicker}
           >
-            <div style={{ display: "grid", gap: "0.85rem", maxWidth: "620px" }}>
+            <form
+              ref={contactFormRef}
+              onSubmit={handleContactSubmit}
+              style={{ display: "grid", gap: "0.85rem", maxWidth: "620px" }}
+            >
+              <input
+                type="hidden"
+                name="_subject"
+                value="New portfolio message for Nakshatra-kun"
+              />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="text" name="_honey" style={{ display: "none" }} tabIndex="-1" autoComplete="off" />
               <input
                 type="text"
+                name="name"
                 placeholder={CONTACT_CONTENT.placeholders.name}
+                required
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
@@ -833,7 +890,9 @@ export default function Portfolio() {
               />
               <input
                 type="email"
+                name="email"
                 placeholder={CONTACT_CONTENT.placeholders.email}
+                required
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
@@ -844,7 +903,9 @@ export default function Portfolio() {
               />
               <textarea
                 rows={4}
+                name="message"
                 placeholder={CONTACT_CONTENT.placeholders.brief}
+                required
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
@@ -855,6 +916,8 @@ export default function Portfolio() {
                 }}
               />
               <button
+                type="submit"
+                disabled={contactState === "loading"}
                 style={{
                   padding: "0.95rem 1.1rem",
                   borderRadius: "999px",
@@ -864,11 +927,63 @@ export default function Portfolio() {
                   background: `linear-gradient(90deg, ${C.ember}, ${C.sunset})`,
                   textTransform: "uppercase",
                   letterSpacing: "0.12em",
+                  opacity: contactState === "loading" ? 0.7 : 1,
                 }}
               >
-                Summon Contact
+                {contactState === "loading" ? "Summoning..." : "Summon Contact"}
               </button>
-            </div>
+              {contactState !== "idle" && (
+                <div
+                  style={{
+                    marginTop: "0.25rem",
+                    padding: "0.85rem 1rem",
+                    borderRadius: "14px 22px 14px 18px",
+                    border: `1px solid ${
+                      contactState === "success"
+                        ? "rgba(239,197,108,0.4)"
+                        : contactState === "error"
+                          ? "rgba(157,44,18,0.65)"
+                          : "rgba(125,75,28,0.8)"
+                    }`,
+                    background:
+                      contactState === "success"
+                        ? "linear-gradient(180deg, rgba(76,58,20,0.75) 0%, rgba(48,31,12,0.9) 100%)"
+                        : contactState === "error"
+                          ? "linear-gradient(180deg, rgba(89,26,16,0.75) 0%, rgba(52,18,12,0.9) 100%)"
+                          : "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+                    color: contactState === "error" ? "#ffd7c9" : C.sand,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: F.display,
+                      fontSize: "0.95rem",
+                      letterSpacing: "0.08em",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
+                    {contactState === "success"
+                      ? "Mission Complete"
+                      : contactState === "error"
+                        ? "Transmission Failed"
+                        : "Shadow Clone Jutsu"}
+                  </div>
+                  <div style={{ fontSize: "0.92rem" }}>{contactMessage}</div>
+                </div>
+              )}
+              <p
+                style={{
+                  color: C.muted,
+                  fontSize: "0.9rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                Messages stay on this page while sending. If FormSubmit has not
+                been activated yet, the first send may trigger an email
+                confirmation step.
+              </p>
+            </form>
           </SectionShell>
         )}
       </main>
