@@ -1,44 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-
-const IDLE_GIF =
-  "https://i.pinimg.com/originals/ab/0f/af/ab0fafe8753a97c199a10b353ec6a8bb.gif";
-const RUN_GIF = "/running.gif";
-
-const SECTIONS = ["home", "about", "skills", "projects", "contact"];
-const SECTION_BACKGROUNDS = [
-  "/assets/backgrounds/home-konoha.jpg",
-  "/assets/backgrounds/about-naruto.jpg",
-  "/assets/backgrounds/skills-jutsu.jpg",
-  "/assets/backgrounds/missions-cast.jpg",
-  "/assets/backgrounds/contact-funny.jpg",
-];
-const HERO_PROFILE =
-  "https://i.pinimg.com/736x/65/40/ec/6540eccd704245ae4d8a01874186887f.jpg";
-
-const C = {
-  ink: "#140b07",
-  ember: "#9d2c12",
-  sunset: "#d85a1a",
-  gold: "#efc56c",
-  sand: "#f3ddaf",
-  leaf: "#3e5b2b",
-  pine: "#182311",
-  smoke: "rgba(12, 8, 6, 0.78)",
-  panel: "rgba(26, 14, 10, 0.7)",
-  line: "rgba(239, 197, 108, 0.18)",
-  text: "#f6ecd4",
-  muted: "#cfbf9b",
-};
-
-const F = {
-  body: "'Oxanium', sans-serif",
-  display: "'NinjaNaruto', 'Teko', sans-serif",
-};
-
-const SWAP_DELAY_MS = 380;
-const RUN_DURATION_MS = 720;
-const SCROLL_LOCK_MS = 900;
+import {
+  ABOUT_BLURB,
+  ABOUT_STATS,
+  CONTACT_CONTENT,
+  HOME_CONTENT,
+  PROJECTS,
+  SECTIONS,
+  SITE_ASSETS,
+  SKILL_GROUPS,
+} from "./siteData";
+import { C, F, MOTION } from "./theme";
 
 function ThreeScene({ sectionIndex }) {
   const mountRef = useRef(null);
@@ -196,10 +168,10 @@ function NarutoWalker({ isRunning, direction }) {
         position: "relative",
         display: "block",
         transition: "width 160ms ease, height 160ms ease",
-      }}
-    >
+        }}
+      >
       <img
-        src={isRunning ? RUN_GIF : IDLE_GIF}
+        src={isRunning ? SITE_ASSETS.runGif : SITE_ASSETS.idleGif}
         alt="Naruto runner"
         style={{
           position: "absolute",
@@ -421,11 +393,12 @@ function MissionCard({ rank, title, desc, tags }) {
 }
 
 export default function Portfolio() {
+  const initialSpriteX = 10;
   const [sectionIdx, setSectionIdx] = useState(0);
   const [displayIdx, setDisplayIdx] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [direction, setDirection] = useState("right");
-  const [spriteX, setSpriteX] = useState(72);
+  const [spriteX, setSpriteX] = useState(initialSpriteX);
   const [visible, setVisible] = useState(true);
 
   const sectionRef = useRef(0);
@@ -433,7 +406,7 @@ export default function Portfolio() {
   const swapTimerRef = useRef(null);
   const lockRef = useRef(false);
   const touchStartRef = useRef(null);
-  const spriteXRef = useRef(72);
+  const spriteXRef = useRef(initialSpriteX);
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -462,16 +435,16 @@ export default function Portfolio() {
 
     runningTimerRef.current = window.setTimeout(() => {
       setIsRunning(false);
-    }, RUN_DURATION_MS);
+    }, MOTION.runDurationMs);
 
     swapTimerRef.current = window.setTimeout(() => {
       setDisplayIdx(nextIdx);
       setVisible(true);
-    }, SWAP_DELAY_MS);
+    }, MOTION.swapDelayMs);
 
     window.setTimeout(() => {
       lockRef.current = false;
-    }, SCROLL_LOCK_MS);
+    }, MOTION.scrollLockMs);
   }, []);
 
   useEffect(() => {
@@ -555,7 +528,7 @@ export default function Portfolio() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48)), url(${SECTION_BACKGROUNDS[displayIdx]})`,
+          backgroundImage: `linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48)), url(${SITE_ASSETS.sectionBackgrounds[displayIdx]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "brightness(0.88) saturate(0.95)",
@@ -672,10 +645,7 @@ export default function Portfolio() {
         }}
       >
         {displayIdx === 0 && (
-          <SectionShell
-            title="Shinobi Software Engineer"
-            kicker="Leaf Village Tech Corps"
-          >
+          <SectionShell title={HOME_CONTENT.title} kicker={HOME_CONTENT.kicker}>
             <div
               style={{
                 display: "grid",
@@ -692,48 +662,28 @@ export default function Portfolio() {
                     marginBottom: "0.8rem",
                   }}
                 >
-                  Nakshatra-kun is an Associate Software Engineer building
-                  practical systems across Python, Flutter, SAP, and modern
-                  developer tooling.
+                  {HOME_CONTENT.intro}
                 </p>
-                <p
-                  style={{
-                    color: C.muted,
-                    lineHeight: 1.8,
-                    maxWidth: "640px",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  Since joining Yamaha Motor Solutions India Pvt. Ltd. in
-                  January 2025 after graduating from J.C. Bose University of
-                  Science and Technology, YMCA, I have been working on
-                  enterprise software while balancing cloud-native thinking,
-                  API-first design, and real-world product building across SAP
-                  BTP, ABAP RAP, SAP HANA, and OData.
-                </p>
-                <p
-                  style={{
-                    color: C.muted,
-                    lineHeight: 1.8,
-                    maxWidth: "640px",
-                    marginBottom: "1.4rem",
-                  }}
-                >
-                  My strongest working zone blends Python, Flutter, and SAP,
-                  while still extending comfortably into Go, FastAPI,
-                  JavaScript, and C++. I like rapid prototyping, iterative
-                  building, and using AI as a force multiplier without losing
-                  touch with the underlying architecture, constraints, and
-                  system behavior.
-                </p>
+                {HOME_CONTENT.paragraphs.map((paragraph, index) => (
+                  <p
+                    key={paragraph}
+                    style={{
+                      color: C.muted,
+                      lineHeight: 1.8,
+                      maxWidth: "640px",
+                      marginBottom:
+                        index === HOME_CONTENT.paragraphs.length - 1
+                          ? "1.4rem"
+                          : "1rem",
+                    }}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
                 <div
                   style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap" }}
                 >
-                  {[
-                    ["View Missions", 3],
-                    ["Ninja Profile", 1],
-                    ["Contact", 4],
-                  ].map(([label, idx]) => (
+                  {HOME_CONTENT.ctas.map(([label, idx]) => (
                     <button
                       key={label}
                       onClick={() => triggerTransition(idx)}
@@ -770,7 +720,7 @@ export default function Portfolio() {
                 }}
               >
                 <img
-                  src={HERO_PROFILE}
+                  src={SITE_ASSETS.heroProfile}
                   alt="Naruto portrait"
                   style={{
                     width: "100%",
@@ -795,19 +745,9 @@ export default function Portfolio() {
                 gap: "0.9rem",
               }}
             >
-              <StatCard label="Name" value="Nakshatra-kun" />
-              <StatCard
-                label="Alliance"
-                value="Yamaha Motor Solutions India Pvt. Ltd."
-              />
-              <StatCard label="Village" value="Faridabad" />
-              <StatCard label="Rank" value="Associate Software Engineer" />
-              <StatCard label="Specialty" value="Python, Flutter, SAP" />
-              <StatCard label="Status" value="1+ year at Yamaha" />
-              <StatCard
-                label="Current Arc"
-                value="Enterprise software and developer-centric tools"
-              />
+              {ABOUT_STATS.map(([label, value]) => (
+                <StatCard key={label} label={label} value={value} />
+              ))}
             </div>
             <div
               style={{
@@ -818,11 +758,7 @@ export default function Portfolio() {
                 fontSize: "1rem",
               }}
             >
-              Nakshatra-kun focuses on practical, system-driven work rather than
-              surface-level apps. His interests sit at the intersection of
-              enterprise software, automation, AI-assisted development, and
-              developer productivity, with emphasis on building systems that
-              solve real, observable problems.
+              {ABOUT_BLURB}
             </div>
           </SectionShell>
         )}
@@ -836,7 +772,8 @@ export default function Portfolio() {
                 gap: "1.6rem",
               }}
             >
-              <div>
+              {SKILL_GROUPS.map((group) => (
+              <div key={group.title}>
                 <p
                   style={{
                     color: C.gold,
@@ -845,32 +782,18 @@ export default function Portfolio() {
                     letterSpacing: "0.18em",
                   }}
                 >
-                  SAP and Enterprise
+                  {group.title}
                 </p>
-                <SkillBar label="SAP ABAP" value={85} color={C.sunset} />
-                <SkillBar label="SAP BTP" value={82} color={C.gold} />
-                <SkillBar label="ABAP RAP" value={80} color={C.sand} />
-                <SkillBar label="SAP HANA" value={74} color={C.leaf} />
-                <SkillBar label="OData Services" value={76} color={C.ember} />
+                {group.skills.map((skill) => (
+                  <SkillBar
+                    key={skill.label}
+                    label={skill.label}
+                    value={skill.value}
+                    color={skill.color}
+                  />
+                ))}
               </div>
-              <div>
-                <p
-                  style={{
-                    color: C.gold,
-                    marginBottom: "0.9rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.18em",
-                  }}
-                >
-                  Main Battle Stack
-                </p>
-                <SkillBar label="Python / FastAPI" value={84} color="#4b8bbe" />
-                <SkillBar label="Flutter" value={80} color="#4cc2ff" />
-                <SkillBar label="Go" value={72} color="#5dc9e2" />
-                <SkillBar label="JavaScript" value={78} color="#e9b949" />
-                <SkillBar label="C++" value={70} color="#6b8cff" />
-                <SkillBar label="Git" value={84} color="#f05032" />
-              </div>
+              ))}
             </div>
           </SectionShell>
         )}
@@ -884,34 +807,22 @@ export default function Portfolio() {
                 gap: "1rem",
               }}
             >
-              <MissionCard
-                rank="S"
-                title="UNLOOP"
-                desc="A behavioral tracking and control system designed to reduce short-form content consumption across platforms like YouTube Shorts and Instagram Reels, handling real-time event detection, navigation tracking, scroll lag, multi-event batching, and inconsistent transitions in dynamic web flows."
-                tags={["Behavior Tracking", "Realtime Events", "Automation"]}
-              />
-              <MissionCard
-                rank="A"
-                title="CLISKY"
-                desc="An AI-powered CLI assistant that adapts to the user environment, including Linux distribution detection, and generates contextual command recommendations through a modular design with separate model and environment configuration layers."
-                tags={["AI CLI", "Python", "Environment Aware"]}
-              />
-              <MissionCard
-                rank="A"
-                title="Gitroaster"
-                desc="A fully developed and hosted tool that pulls GitHub profile data, analyzes repository activity and metadata, and generates context-aware, data-driven roasts by combining API integration, data processing, and generative AI output."
-                tags={["GitHub API", "Data Processing", "Generative AI"]}
-              />
+              {PROJECTS.map((project) => (
+                <MissionCard key={project.title} {...project} />
+              ))}
             </div>
           </SectionShell>
         )}
 
         {displayIdx === 4 && (
-          <SectionShell title="Hokage's Office" kicker="Send A Mission Brief">
+          <SectionShell
+            title={CONTACT_CONTENT.title}
+            kicker={CONTACT_CONTENT.kicker}
+          >
             <div style={{ display: "grid", gap: "0.85rem", maxWidth: "620px" }}>
               <input
                 type="text"
-                placeholder="Nakshatra Chandna"
+                placeholder={CONTACT_CONTENT.placeholders.name}
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
@@ -922,7 +833,7 @@ export default function Portfolio() {
               />
               <input
                 type="email"
-                placeholder="your@email.com"
+                placeholder={CONTACT_CONTENT.placeholders.email}
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
@@ -933,7 +844,7 @@ export default function Portfolio() {
               />
               <textarea
                 rows={4}
-                placeholder="Tell me about the project, role, or system you want to build."
+                placeholder={CONTACT_CONTENT.placeholders.brief}
                 style={{
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
