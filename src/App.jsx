@@ -860,7 +860,9 @@ export default function Portfolio() {
           height: "100%",
           display: "grid",
           placeItems: isMobile ? "start center" : "center",
-          padding: isMobile ? "5.85rem 0.75rem 1.25rem" : "5.8rem 0.9rem 8.8rem",
+          padding: isMobile
+            ? "5.85rem 0.75rem 1.25rem"
+            : "5.8rem 0.9rem 8.8rem",
           opacity: visible ? 1 : 0,
           transform: visible ? "scale(1)" : "scale(0.985)",
           transition: "opacity 320ms ease, transform 320ms ease",
@@ -1181,74 +1183,63 @@ export default function Portfolio() {
                   <div style={{ fontSize: "0.92rem" }}>{contactMessage}</div>
                 </div>
               )}
-              <p
-                style={{
-                  color: C.muted,
-                  fontSize: "0.9rem",
-                  lineHeight: 1.6,
-                }}
-              >
-                Messages stay on this page while sending. If FormSubmit has not
-                been activated yet, the first send may trigger an email
-                confirmation step.
-              </p>
             </form>
           </SectionShell>
         )}
       </main>
 
       {!isMobile && (
-      <div
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: "138px",
-          zIndex: 25,
-          pointerEvents: "none",
-        }}
-      >
         <div
           style={{
-            position: "absolute",
-            inset: isMobile ? "auto 0 12px 0" : "auto 0 18px 0",
-            height: isMobile ? "16px" : "22px",
-            background:
-              "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.4), rgba(216,90,26,0.52), rgba(239,197,108,0.4), rgba(0,0,0,0))",
-            boxShadow: "0 0 28px rgba(216,90,26,0.2)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: `${spriteX}%`,
-            bottom: isMobile ? "12px" : "18px",
-            width: isMobile ? "78px" : "110px",
-            height: isMobile ? "18px" : "28px",
-            transform: "translateX(-50%)",
-            transition:
-              "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1), width 160ms ease",
-            background:
-              "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: `${spriteX}%`,
-            bottom: isMobile ? "8px" : "12px",
-            transform: "translateX(-50%)",
-            transition: "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1)",
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: "138px",
+            zIndex: 25,
+            pointerEvents: "none",
           }}
         >
-          <NarutoWalker
-            action={characterAction}
-            direction={direction}
-            isMobile={isMobile}
+          <div
+            style={{
+              position: "absolute",
+              inset: isMobile ? "auto 0 12px 0" : "auto 0 18px 0",
+              height: isMobile ? "16px" : "22px",
+              background:
+                "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.4), rgba(216,90,26,0.52), rgba(239,197,108,0.4), rgba(0,0,0,0))",
+              boxShadow: "0 0 28px rgba(216,90,26,0.2)",
+            }}
           />
+          <div
+            style={{
+              position: "absolute",
+              left: `${spriteX}%`,
+              bottom: isMobile ? "12px" : "18px",
+              width: isMobile ? "78px" : "110px",
+              height: isMobile ? "18px" : "28px",
+              transform: "translateX(-50%)",
+              transition:
+                "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1), width 160ms ease",
+              background:
+                "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: `${spriteX}%`,
+              bottom: isMobile ? "8px" : "12px",
+              transform: "translateX(-50%)",
+              transition: "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1)",
+            }}
+          >
+            <NarutoWalker
+              action={characterAction}
+              direction={direction}
+              isMobile={isMobile}
+            />
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
