@@ -482,6 +482,7 @@ export default function Portfolio() {
   const [visible, setVisible] = useState(true);
   const [contactState, setContactState] = useState("idle");
   const [contactMessage, setContactMessage] = useState("");
+  const [showCharacterHelp, setShowCharacterHelp] = useState(false);
 
   const sectionRef = useRef(0);
   const runningTimerRef = useRef(null);
@@ -1308,28 +1309,59 @@ export default function Portfolio() {
             }}
           />
           <div
-            style={{
-              position: "absolute",
-              left: `${spriteX}%`,
-              bottom: isMobile ? "12px" : "18px",
-              width: isMobile ? "78px" : "110px",
-              height: isMobile ? "18px" : "28px",
-              transform: "translateX(-50%)",
-              transition:
-                "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1), width 160ms ease",
-              background:
-                "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
-            }}
-          />
-          <div
+            onMouseEnter={() => setShowCharacterHelp(true)}
+            onMouseLeave={() => setShowCharacterHelp(false)}
             style={{
               position: "absolute",
               left: `${spriteX}%`,
               bottom: isMobile ? "8px" : "12px",
               transform: "translateX(-50%)",
               transition: "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1)",
+              pointerEvents: "auto",
             }}
           >
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                bottom: isMobile ? "108px" : "168px",
+                transform: showCharacterHelp
+                  ? "translate(-50%, 0)"
+                  : "translate(-50%, 8px)",
+                opacity: showCharacterHelp ? 1 : 0,
+                transition: "opacity 180ms ease, transform 180ms ease",
+                padding: "0.65rem 0.85rem",
+                borderRadius: "14px 20px 14px 18px",
+                border: `1px solid ${C.line}`,
+                background:
+                  "linear-gradient(180deg, rgba(62,31,18,0.95) 0%, rgba(28,15,10,0.96) 100%)",
+                boxShadow: "0 16px 40px rgba(0,0,0,0.32)",
+                color: C.sand,
+                whiteSpace: "nowrap",
+                fontSize: "0.82rem",
+                lineHeight: 1.5,
+                pointerEvents: "none",
+              }}
+            >
+              <div style={{ fontFamily: F.display, color: C.gold }}>
+                `WASD` Move • `E` Attack
+              </div>
+              <div>Hold `S` to crouch or crouch-walk</div>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                bottom: isMobile ? "4px" : "6px",
+                width: isMobile ? "78px" : "110px",
+                height: isMobile ? "18px" : "28px",
+                transform: "translateX(-50%)",
+                transition:
+                  "width 160ms ease",
+                background:
+                  "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
+              }}
+            />
             <NarutoWalker
               action={characterAction}
               direction={direction}
