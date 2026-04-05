@@ -15,9 +15,15 @@ import { C, F, MOTION } from "./theme";
 const CHARACTER_ACTIONS = {
   idle: { src: SITE_ASSETS.character.idle },
   run: { src: SITE_ASSETS.character.run },
+  crouchWalk: { src: SITE_ASSETS.character.crouchWalk },
   jump: { src: SITE_ASSETS.character.jump },
   crouch: { src: SITE_ASSETS.character.crouch },
-  attack: { src: SITE_ASSETS.character.attack },
+  attack1: { src: SITE_ASSETS.character.attack1 },
+  attack2: { src: SITE_ASSETS.character.attack2 },
+  attack3: { src: SITE_ASSETS.character.attack3 },
+  crouchAttack1: { src: SITE_ASSETS.character.crouchAttack1 },
+  crouchAttack2: { src: SITE_ASSETS.character.crouchAttack2 },
+  crouchAttack3: { src: SITE_ASSETS.character.crouchAttack3 },
 };
 
 const SECTION_POINTS = SECTIONS.map(
@@ -31,6 +37,10 @@ function isTypingTarget(target) {
 
   const tagName = target.tagName;
   return tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
+}
+
+function pickRandomAction(actions) {
+  return actions[Math.floor(Math.random() * actions.length)];
 }
 
 function ThreeScene({ sectionIndex }) {
@@ -181,10 +191,25 @@ function ThreeScene({ sectionIndex }) {
 
 function NarutoWalker({ action, direction, isMobile }) {
   const actionConfig = CHARACTER_ACTIONS[action] ?? CHARACTER_ACTIONS.idle;
-  const frameWidth = isMobile ? 150 : 210;
+  const frameWidth = isMobile ? 150 : 400;
   const frameHeight = isMobile ? 118 : 200;
   const spriteHeight =
-    action === "jump" ? (isMobile ? 114 : 200) : isMobile ? 102 : 146;
+    action === "jump"
+      ? isMobile
+        ? 114
+        : 200
+      : action === "crouchAttack2" || action === "crouchAttack1"
+      ? isMobile
+        ? 112
+        : 220
+      : action === "crouchAttack3"
+      ? isMobile
+        ? 108
+        : 180
+      : isMobile
+      ? 102
+      : 146;
+  const spriteBottom = action === "crouchAttack2" ? (isMobile ? -6 : -20) : 0;
 
   return (
     <div
@@ -205,7 +230,7 @@ function NarutoWalker({ action, direction, isMobile }) {
           height: `${spriteHeight}px`,
           width: "auto",
           left: "50%",
-          bottom: 0,
+          bottom: `${spriteBottom}px`,
           display: "block",
           transform:
             direction === "left"
@@ -225,13 +250,7 @@ function NarutoWalker({ action, direction, isMobile }) {
   );
 }
 
-function SectionShell({
-  title,
-  kicker,
-  children,
-  isMobile,
-  titleStyle,
-}) {
+function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
   return (
     <section
       style={{
@@ -478,8 +497,8 @@ export default function Portfolio() {
   const heroPortraitMaxHeight = isMobile
     ? Math.min(Math.max(viewportHeight * 0.28, 180), 260)
     : isCompactHero
-      ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
-      : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
+    ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
+    : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -496,7 +515,9 @@ export default function Portfolio() {
     const nextX = 10 + (nextIdx / (SECTIONS.length - 1)) * 80;
 
     setDirection(nextX >= currentX ? "right" : "left");
-    setCharacterAction("run");
+    setCharacterAction(
+      pressedKeysRef.current.has("s") ? "crouchWalk" : "run"
+    );
     setSpriteX(nextX);
     spriteXRef.current = nextX;
     setVisible(false);
@@ -511,7 +532,9 @@ export default function Portfolio() {
         !pressedKeysRef.current.has("a") &&
         !pressedKeysRef.current.has("d")
       ) {
-        setCharacterAction("idle");
+        setCharacterAction(
+          pressedKeysRef.current.has("s") ? "crouch" : "idle"
+        );
       }
     }, MOTION.runDurationMs);
 
@@ -632,7 +655,10 @@ export default function Portfolio() {
     const onActionKeyDown = (event) => {
       const key = event.key.toLowerCase();
       if (!["w", "a", "s", "d", "e"].includes(key)) return;
-      if (isTypingTarget(event.target) || isTypingTarget(document.activeElement)) {
+      if (
+        isTypingTarget(event.target) ||
+        isTypingTarget(document.activeElement)
+      ) {
         return;
       }
 
@@ -653,7 +679,15 @@ export default function Portfolio() {
         setCharacterAction("jump");
         actionTimerRef.current = window.setTimeout(endTransientAction, 520);
       } else if (key === "e") {
-        setCharacterAction("attack");
+        setCharacterAction(
+          pressedKeysRef.current.has("s")
+            ? pickRandomAction([
+                "crouchAttack1",
+                "crouchAttack2",
+                "crouchAttack3",
+              ])
+            : pickRandomAction(["attack1", "attack2", "attack3"])
+        );
         actionTimerRef.current = window.setTimeout(endTransientAction, 420);
       }
     };
@@ -661,7 +695,10 @@ export default function Portfolio() {
     const onActionKeyUp = (event) => {
       const key = event.key.toLowerCase();
       if (!["w", "a", "s", "d", "e"].includes(key)) return;
-      if (isTypingTarget(event.target) || isTypingTarget(document.activeElement)) {
+      if (
+        isTypingTarget(event.target) ||
+        isTypingTarget(document.activeElement)
+      ) {
         return;
       }
       pressedKeysRef.current.delete(key);
@@ -671,6 +708,10 @@ export default function Portfolio() {
         !pressedKeysRef.current.has("w") &&
         !pressedKeysRef.current.has("e")
       ) {
+        if (lockRef.current && characterAction === "crouchWalk") {
+          return;
+        }
+
         setCharacterAction("idle");
       }
 
@@ -679,6 +720,14 @@ export default function Portfolio() {
         !pressedKeysRef.current.has("a") &&
         !pressedKeysRef.current.has("d")
       ) {
+        if (
+          lockRef.current ||
+          characterAction === "run" ||
+          characterAction === "crouchWalk"
+        ) {
+          return;
+        }
+
         if (
           !pressedKeysRef.current.has("w") &&
           !pressedKeysRef.current.has("s") &&
@@ -845,7 +894,7 @@ export default function Portfolio() {
             color: C.gold,
           }}
         >
-          KONOHA.DEV
+          IAMNAKSH.TECH
         </div>
         <div
           style={{
@@ -912,17 +961,18 @@ export default function Portfolio() {
               fontSize: isMobile
                 ? "clamp(1.9rem, 10vw, 2.8rem)"
                 : isCompactHero
-                  ? "clamp(2rem, 3.8vw, 3.4rem)"
-                  : "clamp(2.2rem, 4.5vw, 4rem)",
+                ? "clamp(2rem, 3.8vw, 3.4rem)"
+                : "clamp(2.2rem, 4.5vw, 4rem)",
               lineHeight: isMobile ? 1 : 0.98,
             }}
           >
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: isMobile || isCompactHero
-                  ? "minmax(0, 1fr)"
-                  : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
+                gridTemplateColumns:
+                  isMobile || isCompactHero
+                    ? "minmax(0, 1fr)"
+                    : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
                 gap: isMobile ? "1rem" : "1.6rem",
                 alignItems: isMobile || isCompactHero ? "start" : "center",
               }}
@@ -988,8 +1038,8 @@ export default function Portfolio() {
                   width: isMobile
                     ? "min(100%, 220px)"
                     : isCompactHero
-                      ? "min(100%, 240px)"
-                      : "min(100%, 290px)",
+                    ? "min(100%, 240px)"
+                    : "min(100%, 290px)",
                   aspectRatio: "4 / 5",
                   maxHeight: `${heroPortraitMaxHeight}px`,
                   borderRadius: "28px",
