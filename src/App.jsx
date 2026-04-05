@@ -452,6 +452,9 @@ export default function Portfolio() {
   const [viewportWidth, setViewportWidth] = useState(
     typeof window === "undefined" ? 1440 : window.innerWidth
   );
+  const [viewportHeight, setViewportHeight] = useState(
+    typeof window === "undefined" ? 900 : window.innerHeight
+  );
   const [sectionIdx, setSectionIdx] = useState(0);
   const [displayIdx, setDisplayIdx] = useState(0);
   const [characterAction, setCharacterAction] = useState("idle");
@@ -472,6 +475,11 @@ export default function Portfolio() {
   const pressedKeysRef = useRef(new Set());
   const isMobile = viewportWidth < 768;
   const isCompactHero = !isMobile && viewportWidth < 1180;
+  const heroPortraitMaxHeight = isMobile
+    ? Math.min(Math.max(viewportHeight * 0.28, 180), 260)
+    : isCompactHero
+      ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
+      : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -518,7 +526,10 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
-    const onResize = () => setViewportWidth(window.innerWidth);
+    const onResize = () => {
+      setViewportWidth(window.innerWidth);
+      setViewportHeight(window.innerHeight);
+    };
 
     const onWheel = (event) => {
       event.preventDefault();
@@ -980,6 +991,7 @@ export default function Portfolio() {
                       ? "min(100%, 240px)"
                       : "min(100%, 290px)",
                   aspectRatio: "4 / 5",
+                  maxHeight: `${heroPortraitMaxHeight}px`,
                   borderRadius: "28px",
                   overflow: "hidden",
                   border: `1px solid ${C.line}`,
