@@ -1,34 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import {
-  ABOUT_BLURB,
-  ABOUT_STATS,
-  CONTACT_CONTENT,
-  HOME_CONTENT,
-  PROJECTS,
-  SECTIONS,
-  SITE_ASSETS,
-  SKILL_GROUPS,
-} from "./siteData";
-import { C, F, MOTION } from "./theme";
+import ThemeSelector from "./components/ThemeSelector";
+import { ThemeProvider, useThemeTokens } from "./theme-context";
+import { THEMES, getThemeById } from "./themes";
 
-const CHARACTER_ACTIONS = {
-  idle: { src: SITE_ASSETS.character.idle },
-  run: { src: SITE_ASSETS.character.run },
-  crouchWalk: { src: SITE_ASSETS.character.crouchWalk },
-  jump: { src: SITE_ASSETS.character.jump },
-  crouch: { src: SITE_ASSETS.character.crouch },
-  attack1: { src: SITE_ASSETS.character.attack1 },
-  attack2: { src: SITE_ASSETS.character.attack2 },
-  attack3: { src: SITE_ASSETS.character.attack3 },
-  crouchAttack1: { src: SITE_ASSETS.character.crouchAttack1 },
-  crouchAttack2: { src: SITE_ASSETS.character.crouchAttack2 },
-  crouchAttack3: { src: SITE_ASSETS.character.crouchAttack3 },
-};
+function buildCharacterActions(characterAssets) {
+  return {
+    idle: { src: characterAssets.idle },
+    run: { src: characterAssets.run },
+    crouchWalk: { src: characterAssets.crouchWalk },
+    jump: { src: characterAssets.jump },
+    crouch: { src: characterAssets.crouch },
+    attack1: { src: characterAssets.attack1 },
+    attack2: { src: characterAssets.attack2 },
+    attack3: { src: characterAssets.attack3 },
+    crouchAttack1: { src: characterAssets.crouchAttack1 },
+    crouchAttack2: { src: characterAssets.crouchAttack2 },
+    crouchAttack3: { src: characterAssets.crouchAttack3 },
+  };
+}
 
-const SECTION_POINTS = SECTIONS.map(
-  (_, index) => 10 + (index / (SECTIONS.length - 1)) * 80
-);
+function getSectionPoints(sections) {
+  return sections.map(
+    (_, index) => 10 + (index / Math.max(sections.length - 1, 1)) * 80
+  );
+}
 
 function isTypingTarget(target) {
   if (!(target instanceof HTMLElement)) return false;
@@ -44,6 +40,7 @@ function pickRandomAction(actions) {
 }
 
 function ThreeScene({ sectionIndex }) {
+  const { C } = useThemeTokens();
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -74,7 +71,7 @@ function ThreeScene({ sectionIndex }) {
     const pointCloud = new THREE.Points(
       particles,
       new THREE.PointsMaterial({
-        color: 0xefc56c,
+        color: new THREE.Color(C.gold),
         size: 0.045,
         transparent: true,
         opacity: 0.7,
@@ -177,7 +174,7 @@ function ThreeScene({ sectionIndex }) {
       if (mount.contains(renderer.domElement))
         mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [C.gold]);
 
   useEffect(() => {
     const scene = sceneRef.current;
@@ -190,7 +187,9 @@ function ThreeScene({ sectionIndex }) {
 }
 
 function NarutoWalker({ action, direction, isMobile }) {
-  const actionConfig = CHARACTER_ACTIONS[action] ?? CHARACTER_ACTIONS.idle;
+  const { theme } = useThemeTokens();
+  const characterActions = buildCharacterActions(theme.assets.character);
+  const actionConfig = characterActions[action] ?? characterActions.idle;
   const frameWidth = isMobile ? 150 : 400;
   const frameHeight = isMobile ? 118 : 200;
   const spriteHeight =
@@ -251,6 +250,7 @@ function NarutoWalker({ action, direction, isMobile }) {
 }
 
 function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
+  const { C, F } = useThemeTokens();
   return (
     <section
       style={{
@@ -342,6 +342,7 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
 }
 
 function StatCard({ label, value }) {
+  const { C, F } = useThemeTokens();
   return (
     <div
       style={{
@@ -379,6 +380,7 @@ function StatCard({ label, value }) {
 }
 
 function SkillBar({ label, value, color }) {
+  const { C } = useThemeTokens();
   return (
     <div style={{ marginBottom: "1rem" }}>
       <div
@@ -415,6 +417,7 @@ function SkillBar({ label, value, color }) {
 }
 
 function MissionCard({ rank, title, desc, tags }) {
+  const { C, F } = useThemeTokens();
   return (
     <article
       style={{
@@ -466,7 +469,86 @@ function MissionCard({ rank, title, desc, tags }) {
   );
 }
 
-export default function Portfolio() {
+function ThemeLoadingScreen({ theme }) {
+  const { colors: C, fonts: F } = theme.design;
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "#000000",
+        display: "grid",
+        placeItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        color: C.text,
+        fontFamily: F.body,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at center, rgba(239,197,108,0.1) 0%, rgba(239,197,108,0.04) 16%, rgba(0,0,0,0) 42%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "grid",
+          justifyItems: "center",
+          gap: "1rem",
+          padding: "1.5rem",
+          textAlign: "center",
+          isolation: "isolate",
+        }}
+      >
+        <img
+          src={theme.assets.ui.loader}
+          alt={`${theme.label} loading`}
+          style={{
+            width: isMobile ? "min(72vw, 260px)" : "min(44vw, 220px)",
+            maxWidth: isMobile ? "260px" : "220px",
+            minWidth: isMobile ? "180px" : "120px",
+            height: "auto",
+            display: "block",
+            opacity: 1,
+            filter:
+              "contrast(1.04) brightness(1.02) drop-shadow(0 14px 28px rgba(0,0,0,0.45))",
+          }}
+        />
+        <div
+          style={{
+            fontFamily: F.display,
+            fontSize: "clamp(1.4rem, 4vw, 2rem)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: C.gold,
+          }}
+        >
+          Entering {theme.label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PortfolioExperience({ activeTheme, onSwitchTheme }) {
+  const { C, F, MOTION } = useThemeTokens();
+  const { assets, content, sections } = activeTheme;
+  const HOME_CONTENT = content.home;
+  const ABOUT_STATS = content.about.stats;
+  const ABOUT_BLURB = content.about.blurb;
+  const SKILL_GROUPS = content.skills;
+  const PROJECTS = content.projects;
+  const CONTACT_CONTENT = content.contact;
+  const sectionPoints = useMemo(() => getSectionPoints(sections), [sections]);
   const initialSpriteX = 10;
   const [viewportWidth, setViewportWidth] = useState(
     typeof window === "undefined" ? 1440 : window.innerWidth
@@ -483,6 +565,7 @@ export default function Portfolio() {
   const [contactState, setContactState] = useState("idle");
   const [contactMessage, setContactMessage] = useState("");
   const [showCharacterHelp, setShowCharacterHelp] = useState(false);
+  const [isThemeMounted, setIsThemeMounted] = useState(false);
 
   const sectionRef = useRef(0);
   const runningTimerRef = useRef(null);
@@ -501,53 +584,66 @@ export default function Portfolio() {
     ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
     : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
 
-  const triggerTransition = useCallback((nextIdx) => {
-    if (
-      lockRef.current ||
-      nextIdx < 0 ||
-      nextIdx >= SECTIONS.length ||
-      nextIdx === sectionRef.current
-    ) {
-      return;
-    }
-
-    lockRef.current = true;
-    const currentX = spriteXRef.current;
-    const nextX = 10 + (nextIdx / (SECTIONS.length - 1)) * 80;
-
-    setDirection(nextX >= currentX ? "right" : "left");
-    setCharacterAction(
-      pressedKeysRef.current.has("s") ? "crouchWalk" : "run"
-    );
-    setSpriteX(nextX);
-    spriteXRef.current = nextX;
-    setVisible(false);
-    setSectionIdx(nextIdx);
-    sectionRef.current = nextIdx;
-
-    window.clearTimeout(runningTimerRef.current);
-    window.clearTimeout(swapTimerRef.current);
-
-    runningTimerRef.current = window.setTimeout(() => {
-      if (
-        !pressedKeysRef.current.has("a") &&
-        !pressedKeysRef.current.has("d")
-      ) {
-        setCharacterAction(
-          pressedKeysRef.current.has("s") ? "crouch" : "idle"
-        );
-      }
-    }, MOTION.runDurationMs);
-
-    swapTimerRef.current = window.setTimeout(() => {
-      setDisplayIdx(nextIdx);
-      setVisible(true);
-    }, MOTION.swapDelayMs);
-
-    window.setTimeout(() => {
-      lockRef.current = false;
-    }, MOTION.scrollLockMs);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsThemeMounted(true), 40);
+    return () => window.clearTimeout(timer);
   }, []);
+
+  const triggerTransition = useCallback(
+    (nextIdx) => {
+      if (
+        lockRef.current ||
+        nextIdx < 0 ||
+        nextIdx >= sections.length ||
+        nextIdx === sectionRef.current
+      ) {
+        return;
+      }
+
+      lockRef.current = true;
+      const currentX = spriteXRef.current;
+      const nextX = 10 + (nextIdx / Math.max(sections.length - 1, 1)) * 80;
+
+      setDirection(nextX >= currentX ? "right" : "left");
+      setCharacterAction(
+        pressedKeysRef.current.has("s") ? "crouchWalk" : "run"
+      );
+      setSpriteX(nextX);
+      spriteXRef.current = nextX;
+      setVisible(false);
+      setSectionIdx(nextIdx);
+      sectionRef.current = nextIdx;
+
+      window.clearTimeout(runningTimerRef.current);
+      window.clearTimeout(swapTimerRef.current);
+
+      runningTimerRef.current = window.setTimeout(() => {
+        if (
+          !pressedKeysRef.current.has("a") &&
+          !pressedKeysRef.current.has("d")
+        ) {
+          setCharacterAction(
+            pressedKeysRef.current.has("s") ? "crouch" : "idle"
+          );
+        }
+      }, MOTION.runDurationMs);
+
+      swapTimerRef.current = window.setTimeout(() => {
+        setDisplayIdx(nextIdx);
+        setVisible(true);
+      }, MOTION.swapDelayMs);
+
+      window.setTimeout(() => {
+        lockRef.current = false;
+      }, MOTION.scrollLockMs);
+    },
+    [
+      MOTION.runDurationMs,
+      MOTION.scrollLockMs,
+      MOTION.swapDelayMs,
+      sections.length,
+    ]
+  );
 
   useEffect(() => {
     const onResize = () => {
@@ -619,7 +715,7 @@ export default function Portfolio() {
       let closestIndex = 0;
       let closestDistance = Infinity;
 
-      SECTION_POINTS.forEach((point, index) => {
+      sectionPoints.forEach((point, index) => {
         const distance = Math.abs(spriteXRef.current - point);
         if (distance < closestDistance) {
           closestDistance = distance;
@@ -645,7 +741,7 @@ export default function Portfolio() {
       const currentIndex = closestSectionIndex();
       const nextIndex = Math.max(
         0,
-        Math.min(SECTIONS.length - 1, currentIndex + step)
+        Math.min(sections.length - 1, currentIndex + step)
       );
 
       if (nextIndex === currentIndex) return;
@@ -745,7 +841,7 @@ export default function Portfolio() {
       window.removeEventListener("keydown", onActionKeyDown);
       window.removeEventListener("keyup", onActionKeyUp);
     };
-  }, [characterAction, triggerTransition]);
+  }, [characterAction, sectionPoints, sections.length, triggerTransition]);
 
   const handleContactSubmit = useCallback(
     async (event) => {
@@ -801,6 +897,10 @@ export default function Portfolio() {
           "radial-gradient(circle at top, rgba(216,90,26,0.22) 0%, rgba(216,90,26,0) 36%), linear-gradient(180deg, #34150d 0%, #160b08 38%, #090606 100%)",
         fontFamily: F.body,
         color: C.text,
+        opacity: isThemeMounted ? 1 : 0,
+        transform: isThemeMounted ? "scale(1)" : "scale(1.025)",
+        transition:
+          "opacity 560ms cubic-bezier(0.22, 1, 0.36, 1), transform 760ms cubic-bezier(0.22, 1, 0.36, 1)",
       }}
     >
       <style>{`
@@ -813,10 +913,10 @@ export default function Portfolio() {
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { overflow: hidden; }
-        html, body, * { cursor: url('/assets/kunai-cursor.png') 8 8, auto; }
+        html, body, * { cursor: url('${assets.ui.cursor}') 8 8, auto; }
         button, input, textarea { font: inherit; }
         button, a, [role="button"], nav *, button:hover, a:hover, [role="button"]:hover {
-          cursor: url('/assets/kunai-focus-cursor.png') 8 8, pointer !important;
+          cursor: url('${assets.ui.focusCursor}') 8 8, pointer !important;
         }
         a { color: inherit; }
       `}</style>
@@ -825,7 +925,7 @@ export default function Portfolio() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48)), url(${SITE_ASSETS.sectionBackgrounds[displayIdx]})`,
+          backgroundImage: `linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48)), url(${assets.sectionBackgrounds[displayIdx]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "brightness(0.88) saturate(0.95)",
@@ -909,7 +1009,26 @@ export default function Portfolio() {
             scrollbarWidth: "none",
           }}
         >
-          {SECTIONS.map((section, idx) => (
+          <button
+            onClick={onSwitchTheme}
+            style={{
+              borderRadius: "999px",
+              border: `1px solid ${C.line}`,
+              background: "rgba(239,197,108,0.08)",
+              color: C.sand,
+              padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              cursor: "pointer",
+              fontFamily: F.display,
+              whiteSpace: "nowrap",
+              fontSize: isMobile ? "0.82rem" : "1rem",
+              flex: "0 0 auto",
+            }}
+          >
+            Themes
+          </button>
+          {sections.map((section, idx) => (
             <button
               key={section}
               onClick={() => triggerTransition(idx)}
@@ -1033,36 +1152,36 @@ export default function Portfolio() {
                   ))}
                 </div>
               </div>
-              <div
-                style={{
-                  justifySelf: "center",
-                  width: isMobile
-                    ? "min(100%, 220px)"
-                    : isCompactHero
-                    ? "min(100%, 240px)"
-                    : "min(100%, 290px)",
-                  aspectRatio: "4 / 5",
-                  maxHeight: `${heroPortraitMaxHeight}px`,
-                  borderRadius: "28px",
-                  overflow: "hidden",
-                  border: `1px solid ${C.line}`,
-                  background: "rgba(255,255,255,0.04)",
-                  boxShadow: "0 18px 50px rgba(0,0,0,0.3)",
-                }}
-              >
-                <img
-                  src={SITE_ASSETS.heroProfile}
-                  alt="Naruto portrait"
+              {!isMobile && (
+                <div
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center top",
-                    display: "block",
-                    filter: "saturate(0.94) contrast(1.03)",
+                    justifySelf: "center",
+                    width: isCompactHero
+                      ? "min(100%, 240px)"
+                      : "min(100%, 290px)",
+                    aspectRatio: "4 / 5",
+                    maxHeight: `${heroPortraitMaxHeight}px`,
+                    borderRadius: "28px",
+                    overflow: "hidden",
+                    border: `1px solid ${C.line}`,
+                    background: "rgba(255,255,255,0.04)",
+                    boxShadow: "0 18px 50px rgba(0,0,0,0.3)",
                   }}
-                />
-              </div>
+                >
+                  <img
+                    src={assets.heroProfile}
+                    alt="Naruto portrait"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "center top",
+                      display: "block",
+                      filter: "saturate(0.94) contrast(1.03)",
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </SectionShell>
         )}
@@ -1356,8 +1475,7 @@ export default function Portfolio() {
                 width: isMobile ? "78px" : "110px",
                 height: isMobile ? "18px" : "28px",
                 transform: "translateX(-50%)",
-                transition:
-                  "width 160ms ease",
+                transition: "width 160ms ease",
                 background:
                   "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
               }}
@@ -1371,5 +1489,61 @@ export default function Portfolio() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const [pendingThemeId, setPendingThemeId] = useState(null);
+  const [isEnteringTheme, setIsEnteringTheme] = useState(false);
+  const [isThemeLoading, setIsThemeLoading] = useState(false);
+  const activeTheme = selectedThemeId ? getThemeById(selectedThemeId) : null;
+  const loadingTheme = pendingThemeId ? getThemeById(pendingThemeId) : null;
+
+  const handleThemeSelect = useCallback((themeId) => {
+    setPendingThemeId(themeId);
+    setIsEnteringTheme(true);
+
+    window.setTimeout(() => {
+      setIsThemeLoading(true);
+      setIsEnteringTheme(false);
+    }, 700);
+
+    window.setTimeout(() => {
+      setSelectedThemeId(themeId);
+      setIsThemeLoading(false);
+      setPendingThemeId(null);
+    }, 2200);
+  }, []);
+
+  const handleSwitchTheme = useCallback(() => {
+    setSelectedThemeId(null);
+    setPendingThemeId(null);
+    setIsEnteringTheme(false);
+    setIsThemeLoading(false);
+  }, []);
+
+  if (isThemeLoading && loadingTheme) {
+    return <ThemeLoadingScreen theme={loadingTheme} />;
+  }
+
+  if (!activeTheme) {
+    return (
+      <ThemeSelector
+        themes={THEMES}
+        onSelect={handleThemeSelect}
+        isEnteringTheme={isEnteringTheme}
+        pendingThemeId={pendingThemeId}
+      />
+    );
+  }
+
+  return (
+    <ThemeProvider theme={activeTheme}>
+      <PortfolioExperience
+        activeTheme={activeTheme}
+        onSwitchTheme={handleSwitchTheme}
+      />
+    </ThemeProvider>
   );
 }
