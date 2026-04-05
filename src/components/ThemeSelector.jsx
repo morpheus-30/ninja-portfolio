@@ -115,16 +115,17 @@ export default function ThemeSelector({
           >
             Choose Your World
           </h1>
-          <p style={{ color: "#cfbf9b", lineHeight: 1.7, fontSize: "1rem" }}>
+          {/* <p style={{ color: "#cfbf9b", lineHeight: 1.7, fontSize: "1rem" }}>
             Themes now live as isolated data and asset bundles, so adding more
             universes later is just a matter of dropping in a new theme module.
-          </p>
+          </p> */}
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 340px))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(100%, 280px), 340px))",
             gap: "1.25rem",
             alignItems: "stretch",
           }}
@@ -153,7 +154,11 @@ export default function ThemeSelector({
                     ? "translateY(-14px) scale(1.08)"
                     : "translateY(0) scale(1)"
                   : "translateY(28px) scale(0.98)",
-                transition: `opacity 540ms ease ${index * 90}ms, transform 720ms cubic-bezier(0.22, 1, 0.36, 1) ${index * 90}ms, border-color 220ms ease, box-shadow 220ms ease`,
+                transition: `opacity 540ms ease ${
+                  index * 90
+                }ms, transform 720ms cubic-bezier(0.22, 1, 0.36, 1) ${
+                  index * 90
+                }ms, border-color 220ms ease, box-shadow 220ms ease`,
                 animation: "selectorFloat 7s ease-in-out infinite",
                 animationDelay: `${index * 180}ms`,
                 pointerEvents: isEnteringTheme ? "none" : "auto",
@@ -173,8 +178,7 @@ export default function ThemeSelector({
                     pendingThemeId === theme.id && isEnteringTheme
                       ? "scale(1.14)"
                       : "scale(1)",
-                  transition:
-                    "transform 760ms cubic-bezier(0.22, 1, 0.36, 1)",
+                  transition: "transform 760ms cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
               />
               <div
