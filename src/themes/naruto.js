@@ -1,3 +1,5 @@
+import { sharedPortfolioContent } from "./content";
+
 export const narutoTheme = {
   id: "naruto",
   label: "Naruto",
@@ -27,6 +29,58 @@ export const narutoTheme = {
       swapDelayMs: 380,
       runDurationMs: 720,
       scrollLockMs: 900,
+      actionDurations: {
+        jump: 780,
+        attack1: 420,
+        attack2: 420,
+        attack3: 420,
+        crouchAttack1: 420,
+        crouchAttack2: 420,
+        crouchAttack3: 420,
+      },
+    },
+    chrome: {
+      appBackground:
+        "radial-gradient(circle at top, rgba(216,90,26,0.22) 0%, rgba(216,90,26,0) 36%), linear-gradient(180deg, #34150d 0%, #160b08 38%, #090606 100%)",
+      backgroundImageOverlay:
+        "linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48))",
+      backgroundFilter: "brightness(0.88) saturate(0.95)",
+      topAtmosphere:
+        "radial-gradient(circle at 50% 18%, rgba(239,197,108,0.22) 0, rgba(239,197,108,0.08) 10%, rgba(239,197,108,0) 21%), linear-gradient(180deg, rgba(219,108,43,0.08) 0%, rgba(36,17,11,0.03) 30%, rgba(6,5,5,0.08) 100%)",
+      gridOverlay:
+        "linear-gradient(rgba(239,197,108,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(239,197,108,0.05) 1px, transparent 1px)",
+      bottomAtmosphere:
+        "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(24,35,17,0.78) 20%, rgba(15,21,10,0.98) 100%)",
+      sectionBorder: "2px solid rgba(125, 75, 28, 0.72)",
+      sectionBackground:
+        "linear-gradient(180deg, rgba(66,34,18,0.88) 0%, rgba(34,18,10,0.94) 100%)",
+      sectionShadow:
+        "0 28px 80px rgba(0, 0, 0, 0.28), inset 0 0 0 2px rgba(239,197,108,0.08), inset 0 18px 30px rgba(255,182,85,0.05)",
+      sectionTopBar:
+        "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.28), rgba(216,90,26,0.45), rgba(239,197,108,0.28), rgba(0,0,0,0))",
+      sectionGrid:
+        "linear-gradient(rgba(239,197,108,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(239,197,108,0.12) 1px, transparent 1px)",
+      statCardBorder: "1px solid rgba(125, 75, 28, 0.8)",
+      statCardBackground:
+        "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+      missionCardBorder: "1px solid rgba(125, 75, 28, 0.8)",
+      missionCardBackground:
+        "linear-gradient(180deg, rgba(70,35,18,0.7) 0%, rgba(40,20,12,0.85) 100%)",
+      pillBackground: "rgba(239,197,108,0.09)",
+      navBackground: "rgba(12, 8, 6, 0.78)",
+      themeButtonBackground: "rgba(239,197,108,0.08)",
+      inputBackground: "rgba(255,255,255,0.04)",
+      mediaFrameBackground: "rgba(255,255,255,0.04)",
+      contactPendingBackground:
+        "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+      contactSuccessBackground:
+        "linear-gradient(180deg, rgba(76,58,20,0.75) 0%, rgba(48,31,12,0.9) 100%)",
+      contactErrorBackground:
+        "linear-gradient(180deg, rgba(89,26,16,0.75) 0%, rgba(52,18,12,0.9) 100%)",
+      helpTooltipBackground:
+        "linear-gradient(180deg, rgba(62,31,18,0.95) 0%, rgba(28,15,10,0.96) 100%)",
+      groundGlow:
+        "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.4), rgba(216,90,26,0.52), rgba(239,197,108,0.4), rgba(0,0,0,0))",
     },
   },
   sections: ["home", "about", "skills", "projects", "contact"],
@@ -64,13 +118,9 @@ export const narutoTheme = {
   content: {
     home: {
       kicker: "Leaf Village Tech Division",
-      title: "Software Engineer",
-      intro:
-        "Associate Software Engineer building practical systems across Python, Flutter, SAP, and developer tooling.",
-      paragraphs: [
-        "Currently at Yamaha Motor Solutions India, focused on enterprise systems, API-first design, and reliable execution with a practical engineering mindset.",
-        "Primary stack includes Python, Flutter, and SAP, with hands-on exploration in Go, FastAPI, JavaScript, and C++.",
-      ],
+      title: sharedPortfolioContent.home.title,
+      intro: sharedPortfolioContent.home.intro,
+      paragraphs: sharedPortfolioContent.home.paragraphs,
       ctas: [
         ["View Missions", 3],
         ["Ninja Profile", 1],
@@ -78,69 +128,48 @@ export const narutoTheme = {
       ],
     },
     about: {
+      title: "Ninja Profile",
+      kicker: "Character Sheet",
       stats: [
-        ["Name", "Nakshatra-kun"],
-        ["Alliance", "Yamaha Motor Solutions India Pvt. Ltd."],
-        ["Village", "Faridabad"],
-        ["Rank", "Associate Software Engineer"],
-        ["Primary Techniques", "Python, Flutter, SAP"],
-        ["Experience", "1+ year at Yamaha"],
-        ["Current Arc", "Enterprise systems and developer tools"],
-        ["Side Quests", "Sketching, Learning Guitar, Badminton, TT"],
+        ["Name", sharedPortfolioContent.profile.name],
+        ["Alliance", sharedPortfolioContent.profile.alliance],
+        ["Village", sharedPortfolioContent.profile.village],
+        ["Rank", sharedPortfolioContent.profile.rank],
+        ["Primary Techniques", sharedPortfolioContent.profile.techniques],
+        ["Experience", sharedPortfolioContent.profile.experience],
+        ["Current Arc", sharedPortfolioContent.profile.currentArc],
+        ["Side Quests", sharedPortfolioContent.profile.sideQuests],
       ],
-      blurb:
-        "Nakshatra-kun focuses on building practical, system-driven solutions rather than surface-level applications. His interests lie at the intersection of enterprise engineering and developer productivity, with a focus on solving real, observable problems through structured and scalable systems.",
+      blurb: sharedPortfolioContent.aboutBlurb,
     },
-    skills: [
-      {
-        title: "Forbidden Enterprise Techniques",
-        skills: [
-          { label: "SAP ABAP", value: 85, color: "#d85a1a" },
-          { label: "SAP BTP", value: 82, color: "#efc56c" },
-          { label: "RAP", value: 80, color: "#f3ddaf" },
-          { label: "OData Services", value: 76, color: "#9d2c12" },
-        ],
-      },
-      {
-        title: "Primary Jutsu Arsenal",
-        skills: [
-          { label: "Python / FastAPI", value: 84, color: "#4b8bbe" },
-          { label: "Flutter", value: 80, color: "#4cc2ff" },
-          { label: "Go", value: 50, color: "#5dc9e2" },
-          { label: "JavaScript", value: 78, color: "#e9b949" },
-          { label: "C++", value: 70, color: "#6b8cff" },
-        ],
-      },
-    ],
-    projects: [
-      {
-        rank: "S",
-        title: "UNLOOP",
-        desc: "An S-rank mission focused on controlling short-form content consumption across platforms like YouTube Shorts and Instagram Reels. Handles real-time event detection, navigation tracking, scroll inconsistencies, and dynamic web flow behavior.",
-        tags: ["Behavior Tracking", "Realtime Systems", "Automation"],
-      },
-      {
-        rank: "A",
-        title: "CLISKY",
-        desc: "An AI-powered command-line assistant that adapts to the shinobi's environment, including Linux distribution detection, and generates contextual commands using a modular architecture with separated model and configuration layers.",
-        tags: ["AI CLI", "Python", "System Aware"],
-      },
-      {
-        rank: "A",
-        title: "Gitroaster",
-        desc: "A deployed tool that analyzes GitHub profiles by extracting repository data and activity patterns, generating structured, context-aware roasts using API integration and AI-driven processing.",
-        tags: ["GitHub API", "Data Processing", "Generative AI"],
-      },
-    ],
+    skills: {
+      title: "Jutsu Arsenal",
+      kicker: "Power Levels",
+      groups: sharedPortfolioContent.skills,
+    },
+    projects: {
+      title: "Mission Board",
+      kicker: "Recent Arcs",
+      items: sharedPortfolioContent.projects,
+    },
     contact: {
       kicker: "Issue a Mission Scroll",
       title: "Summon the Shinobi",
-      placeholders: {
-        name: "Nakshatra Chandna",
-        email: "your@email.com",
-        brief:
-          "Describe the system, product, or mission you want to collaborate on.",
+      placeholders: sharedPortfolioContent.contactPlaceholders,
+      submitLabel: "Summon Contact",
+      loadingLabel: "Summoning...",
+      subject: "New portfolio message for Nakshatra-kun",
+      status: {
+        pending: "Shadow Clone Jutsu",
+        success: "Mission Complete",
+        error: "Transmission Failed",
       },
+    },
+    controls: {
+      switchTheme: "Themes",
+      helpTitle: "`WASD` Move • `E` Attack",
+      helpText: "Hold `S` to crouch or crouch-walk",
+      loadingText: "Entering Naruto",
     },
   },
 };

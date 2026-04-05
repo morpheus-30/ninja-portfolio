@@ -7,16 +7,55 @@ import { THEMES, getThemeById } from "./themes";
 function buildCharacterActions(characterAssets) {
   return {
     idle: { src: characterAssets.idle },
-    run: { src: characterAssets.run },
-    crouchWalk: { src: characterAssets.crouchWalk },
-    jump: { src: characterAssets.jump },
-    crouch: { src: characterAssets.crouch },
-    attack1: { src: characterAssets.attack1 },
-    attack2: { src: characterAssets.attack2 },
-    attack3: { src: characterAssets.attack3 },
-    crouchAttack1: { src: characterAssets.crouchAttack1 },
-    crouchAttack2: { src: characterAssets.crouchAttack2 },
-    crouchAttack3: { src: characterAssets.crouchAttack3 },
+    run: { src: characterAssets.run ?? characterAssets.idle },
+    crouchWalk: {
+      src:
+        characterAssets.crouchWalk ??
+        characterAssets.run ??
+        characterAssets.idle,
+    },
+    jump: { src: characterAssets.jump ?? characterAssets.idle },
+    crouch: { src: characterAssets.crouch ?? characterAssets.idle },
+    attack1: {
+      src:
+        characterAssets.attack1 ?? characterAssets.run ?? characterAssets.idle,
+    },
+    attack2: {
+      src:
+        characterAssets.attack2 ??
+        characterAssets.attack1 ??
+        characterAssets.run ??
+        characterAssets.idle,
+    },
+    attack3: {
+      src:
+        characterAssets.attack3 ??
+        characterAssets.attack2 ??
+        characterAssets.attack1 ??
+        characterAssets.run ??
+        characterAssets.idle,
+    },
+    crouchAttack1: {
+      src:
+        characterAssets.crouchAttack1 ??
+        characterAssets.crouch ??
+        characterAssets.idle,
+    },
+    crouchAttack2: {
+      src:
+        characterAssets.crouchAttack2 ??
+        characterAssets.crouchAttack1 ??
+        characterAssets.crouch ??
+        characterAssets.idle,
+    },
+    crouchAttack3: {
+      src:
+        characterAssets.crouchAttack3 ??
+        characterAssets.crouchAttack2 ??
+        characterAssets.crouchAttack1 ??
+        characterAssets.crouch ??
+        characterAssets.idle,
+    },
   };
 }
 
@@ -37,6 +76,10 @@ function isTypingTarget(target) {
 
 function pickRandomAction(actions) {
   return actions[Math.floor(Math.random() * actions.length)];
+}
+
+function getActionDuration(theme, action) {
+  return theme.design.motion.actionDurations?.[action] ?? 420;
 }
 
 function ThreeScene({ sectionIndex }) {
@@ -190,29 +233,74 @@ function NarutoWalker({ action, direction, isMobile }) {
   const { theme } = useThemeTokens();
   const characterActions = buildCharacterActions(theme.assets.character);
   const actionConfig = characterActions[action] ?? characterActions.idle;
+
+  // Outer sprite viewport.
+  // If Gameverse or Naruto feels too zoomed in overall, start with frameWidth/frameHeight.
   const frameWidth = isMobile ? 150 : 400;
-  const frameHeight = isMobile ? 118 : 200;
+  const frameHeight = isMobile ? 118 : 240;
+
+  // Per-action sprite height tuning lives here.
+  // Adjust these branches when a specific GIF looks too tall or too small.
+  // For Gameverse-specific tuning, add `theme.id === "pop"` checks inside the branch you want.
   const spriteHeight =
-    action === "jump"
+    // Gameverse run GIF is taller in source, so keep it shorter than Naruto's run.
+    action === "run" && theme.id === "pop"
+      ? isMobile
+        ? 92
+        : 110
+      : (action === "attack2" || action === "attack3") && theme.id === "pop"
+      ? isMobile
+        ? 108
+        : 170
+      : action === "attack1" && theme.id === "pop"
+      ? isMobile
+        ? 108
+        : 140
+      : action === "jump" && theme.id === "pop"
+      ? isMobile
+        ? 114
+        : 240
+      : theme.id === "pop"
+      ? isMobile
+        ? 108
+        : 200
+      : // Jump GIF needs the tallest frame so the full arc stays visible.
+      action === "jump"
       ? isMobile
         ? 114
         : 200
-      : action === "crouchAttack2" || action === "crouchAttack1"
+      : // These two crouch attack GIFs are smaller in source, so we upscale them.
+      action === "crouchAttack2" || action === "crouchAttack1"
       ? isMobile
         ? 112
         : 220
-      : action === "crouchAttack3"
+      : // Third crouch attack gets its own slightly smaller tuning.
+      action === "crouchAttack3"
       ? isMobile
         ? 108
         : 180
-      : isMobile
+      : // Default size for idle/run/crouch/most other actions.
+      isMobile
       ? 102
       : 146;
-  const spriteBottom = action === "crouchAttack2" ? (isMobile ? -6 : -20) : 0;
+
+  // Vertical offset fixes GIFs whose feet sit too high in the frame.
+  // This is the place to lower or raise a Gameverse GIF if it floats above the ground.
+  const spriteBottom =
+    theme.id === "pop"
+      ? isMobile
+        ? -2
+        : 20
+      : action === "crouchAttack2"
+      ? isMobile
+        ? -6
+        : -20
+      : 0;
 
   return (
     <div
       style={{
+        // This div is the clipping box for the character GIF.
         width: `${frameWidth}px`,
         height: `${frameHeight}px`,
         overflow: "hidden",
@@ -225,6 +313,8 @@ function NarutoWalker({ action, direction, isMobile }) {
         src={actionConfig.src}
         alt="Naruto runner"
         style={{
+          // This img is the actual sprite. `spriteHeight` and `spriteBottom`
+          // are the main controls for Gameverse character sizing/alignment.
           position: "absolute",
           height: `${spriteHeight}px`,
           width: "auto",
@@ -250,22 +340,28 @@ function NarutoWalker({ action, direction, isMobile }) {
 }
 
 function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
-  const { C, F } = useThemeTokens();
+  const { theme, C, F, UI } = useThemeTokens();
+  const isGameverse = theme.id === "pop";
+
   return (
     <section
+      className={isGameverse ? "gameverse-card gameverse-boot" : undefined}
       style={{
+        "--gv-cut": isMobile ? "18px" : "26px",
         width: isMobile
           ? "calc(100vw - 1.5rem)"
           : "min(1120px, calc(100vw - 2.5rem))",
         minHeight: isMobile ? "calc(100vh - 7.5rem)" : "min(70vh, 760px)",
         maxHeight: isMobile ? "calc(100vh - 7.5rem)" : "none",
         padding: isMobile ? "1rem" : "clamp(1.6rem, 2vw, 2.2rem)",
-        border: `2px solid rgba(125, 75, 28, 0.72)`,
-        borderRadius: isMobile ? "14px 24px 14px 24px" : "18px 42px 18px 42px",
-        background:
-          "linear-gradient(180deg, rgba(66,34,18,0.88) 0%, rgba(34,18,10,0.94) 100%)",
-        boxShadow:
-          "0 28px 80px rgba(0, 0, 0, 0.28), inset 0 0 0 2px rgba(239,197,108,0.08), inset 0 18px 30px rgba(255,182,85,0.05)",
+        border: UI.sectionBorder,
+        borderRadius: isGameverse
+          ? "0"
+          : isMobile
+          ? "14px 24px 14px 24px"
+          : "18px 42px 18px 42px",
+        background: UI.sectionBackground,
+        boxShadow: UI.sectionShadow,
         display: "grid",
         alignItems: "center",
         position: "relative",
@@ -274,18 +370,139 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
         WebkitOverflowScrolling: isMobile ? "touch" : "auto",
         overscrollBehavior: isMobile ? "contain" : "auto",
         touchAction: isMobile ? "pan-y" : "auto",
-        clipPath: isMobile
+        clipPath: isGameverse
+          ? "polygon(var(--gv-cut) 0, calc(100% - var(--gv-cut)) 0, 100% var(--gv-cut), 100% calc(100% - var(--gv-cut)), calc(100% - var(--gv-cut)) 100%, var(--gv-cut) 100%, 0 calc(100% - var(--gv-cut)), 0 var(--gv-cut))"
+          : isMobile
           ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
           : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
       }}
     >
+      {isGameverse && (
+        <>
+          <div className="gameverse-particles" aria-hidden="true">
+            {Array.from({ length: 24 }).map((_, index) => (
+              <span
+                key={index}
+                className="gameverse-pixel"
+                style={{
+                  "--x": `${(index * 29) % 100}%`,
+                  "--delay": `${(index % 8) * 0.55}s`,
+                  "--duration": `${8 + (index % 4)}s`,
+                  "--size": `${index % 3 === 0 ? 3 : 2}px`,
+                }}
+              />
+            ))}
+          </div>
+          <div className="gameverse-scanline" aria-hidden="true" />
+          <span className="gv-corner gv-corner-tl" aria-hidden="true" />
+          <span className="gv-corner gv-corner-tr" aria-hidden="true" />
+          <span className="gv-corner gv-corner-bl" aria-hidden="true" />
+          <span className="gv-corner gv-corner-br" aria-hidden="true" />
+        </>
+      )}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(140deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,0) 74%, rgba(255,255,255,0.04) 100%)",
+          opacity: 0.55,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: isMobile ? "10px" : "14px",
+          border: `1px solid ${C.line}`,
+          borderRadius: isGameverse
+            ? "0"
+            : isMobile
+            ? "10px 18px 10px 18px"
+            : "14px 28px 14px 28px",
+          clipPath: isGameverse
+            ? "polygon(var(--gv-cut) 0, calc(100% - var(--gv-cut)) 0, 100% var(--gv-cut), 100% calc(100% - var(--gv-cut)), calc(100% - var(--gv-cut)) 100%, var(--gv-cut) 100%, 0 calc(100% - var(--gv-cut)), 0 var(--gv-cut))"
+            : "none",
+          opacity: 0.45,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: isMobile ? "10px" : "14px",
+          left: isMobile ? "10px" : "14px",
+          width: isMobile ? "48px" : "78px",
+          height: isMobile ? "48px" : "78px",
+          borderTop: `2px solid ${C.line}`,
+          borderLeft: `2px solid ${C.line}`,
+          opacity: 0.5,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          right: isMobile ? "10px" : "14px",
+          bottom: isMobile ? "10px" : "14px",
+          width: isMobile ? "60px" : "104px",
+          height: isMobile ? "60px" : "104px",
+          borderRight: `2px solid ${C.line}`,
+          borderBottom: `2px solid ${C.line}`,
+          opacity: 0.32,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: isMobile ? "96px" : "180px",
+          height: isMobile ? "96px" : "180px",
+          background: `linear-gradient(135deg, ${C.ember}00 0%, ${C.ember}22 48%, ${C.ember}00 48%)`,
+          pointerEvents: "none",
+          opacity: 0.95,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: isMobile ? "110px" : "220px",
+          height: isMobile ? "110px" : "220px",
+          background: `linear-gradient(315deg, ${C.gold}00 0%, ${C.gold}14 42%, ${C.gold}00 42%)`,
+          pointerEvents: "none",
+          opacity: 0.9,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: isMobile ? "auto 10px 10px auto" : "auto 14px 14px auto",
+          width: isMobile ? "68px" : "108px",
+          height: "1px",
+          background: `linear-gradient(90deg, transparent, ${C.gold})`,
+          opacity: 0.72,
+          pointerEvents: "none",
+        }}
+      />
       <div
         style={{
           position: "absolute",
           inset: "0 0 auto 0",
           height: "14px",
+          background: UI.sectionTopBar,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
           background:
-            "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.28), rgba(216,90,26,0.45), rgba(239,197,108,0.28), rgba(0,0,0,0))",
+            "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 28%, rgba(255,255,255,0) 100%)",
+          pointerEvents: "none",
         }}
       />
       <div
@@ -293,22 +510,50 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
           position: "absolute",
           inset: 0,
           opacity: 0.08,
-          backgroundImage:
-            "linear-gradient(rgba(239,197,108,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(239,197,108,0.12) 1px, transparent 1px)",
+          backgroundImage: UI.sectionGrid,
           backgroundSize: "34px 34px",
           pointerEvents: "none",
         }}
       />
       <div
         style={{
+          position: "absolute",
+          top: isMobile ? "1rem" : "1.3rem",
+          right: isMobile ? "0.9rem" : "1.4rem",
+          display: "grid",
+          gap: isMobile ? "0.32rem" : "0.42rem",
+          opacity: 0.5,
+          pointerEvents: "none",
+        }}
+      >
+        {[0, 1, 2].map((index) => (
+          <div
+            key={index}
+            style={{
+              width: isMobile ? "28px" : "42px",
+              height: "2px",
+              background:
+                index === 1
+                  ? `linear-gradient(90deg, ${C.gold}, ${C.ember})`
+                  : C.line,
+            }}
+          />
+        ))}
+      </div>
+      <div
+        style={{
           position: "relative",
           zIndex: 1,
           overflow: "visible",
           paddingRight: isMobile ? "0.2rem" : 0,
+          paddingTop: isMobile ? "0.15rem" : "0.2rem",
         }}
       >
         <p
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.55rem",
             color: C.gold,
             letterSpacing: "0.28em",
             textTransform: "uppercase",
@@ -317,6 +562,15 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
             fontFamily: F.display,
           }}
         >
+          <span
+            style={{
+              width: isMobile ? "24px" : "34px",
+              height: "2px",
+              background: `linear-gradient(90deg, ${C.ember}, ${C.gold})`,
+              display: "inline-block",
+              flex: "0 0 auto",
+            }}
+          />
           {kicker}
         </p>
         <h2
@@ -330,6 +584,7 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
             marginBottom: isMobile ? "0.9rem" : "1.25rem",
             textTransform: "uppercase",
             letterSpacing: "0.04em",
+            textShadow: `0 0 24px ${C.ember}22`,
             ...titleStyle,
           }}
         >
@@ -342,19 +597,21 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
 }
 
 function StatCard({ label, value }) {
-  const { C, F } = useThemeTokens();
+  const { theme, C, F, UI } = useThemeTokens();
+  const isGameverse = theme.id === "pop";
   return (
     <div
+      className={isGameverse ? "gameverse-stat" : undefined}
       style={{
         padding: "1rem 1.1rem",
         borderRadius: "12px 22px 12px 18px",
-        border: `1px solid rgba(125, 75, 28, 0.8)`,
-        background:
-          "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+        border: UI.statCardBorder,
+        background: UI.statCardBackground,
         boxShadow: "inset 0 0 0 1px rgba(239,197,108,0.07)",
       }}
     >
       <div
+        className={isGameverse ? "gameverse-stat-label" : undefined}
         style={{
           color: C.gold,
           fontSize: "0.72rem",
@@ -366,6 +623,7 @@ function StatCard({ label, value }) {
         {label}
       </div>
       <div
+        className={isGameverse ? "gameverse-stat-value" : undefined}
         style={{
           color: C.text,
           fontSize: "1rem",
@@ -417,15 +675,14 @@ function SkillBar({ label, value, color }) {
 }
 
 function MissionCard({ rank, title, desc, tags }) {
-  const { C, F } = useThemeTokens();
+  const { C, F, UI } = useThemeTokens();
   return (
     <article
       style={{
         padding: "1.2rem",
         borderRadius: "14px 26px 14px 22px",
-        border: `1px solid rgba(125, 75, 28, 0.8)`,
-        background:
-          "linear-gradient(180deg, rgba(70,35,18,0.7) 0%, rgba(40,20,12,0.85) 100%)",
+        border: UI.missionCardBorder,
+        background: UI.missionCardBackground,
         boxShadow: "inset 0 0 0 1px rgba(239,197,108,0.06)",
       }}
     >
@@ -455,7 +712,7 @@ function MissionCard({ rank, title, desc, tags }) {
             style={{
               padding: "0.28rem 0.55rem",
               borderRadius: "999px",
-              background: "rgba(239,197,108,0.09)",
+              background: UI.pillBackground,
               border: `1px solid ${C.line}`,
               color: C.sand,
               fontSize: "0.78rem",
@@ -509,20 +766,22 @@ function ThemeLoadingScreen({ theme }) {
           isolation: "isolate",
         }}
       >
-        <img
-          src={theme.assets.ui.loader}
-          alt={`${theme.label} loading`}
-          style={{
-            width: isMobile ? "min(72vw, 260px)" : "min(44vw, 220px)",
-            maxWidth: isMobile ? "260px" : "220px",
-            minWidth: isMobile ? "180px" : "120px",
-            height: "auto",
-            display: "block",
-            opacity: 1,
-            filter:
-              "contrast(1.04) brightness(1.02) drop-shadow(0 14px 28px rgba(0,0,0,0.45))",
-          }}
-        />
+        {theme.assets.ui.loader && (
+          <img
+            src={theme.assets.ui.loader}
+            alt={`${theme.label} loading`}
+            style={{
+              width: isMobile ? "min(72vw, 260px)" : "min(44vw, 220px)",
+              maxWidth: isMobile ? "260px" : "220px",
+              minWidth: isMobile ? "180px" : "120px",
+              height: "auto",
+              display: "block",
+              opacity: 1,
+              filter:
+                "contrast(1.04) brightness(1.02) drop-shadow(0 14px 28px rgba(0,0,0,0.45))",
+            }}
+          />
+        )}
         <div
           style={{
             fontFamily: F.display,
@@ -532,7 +791,7 @@ function ThemeLoadingScreen({ theme }) {
             color: C.gold,
           }}
         >
-          Entering {theme.label}
+          {theme.content.controls.loadingText}
         </div>
       </div>
     </div>
@@ -540,14 +799,15 @@ function ThemeLoadingScreen({ theme }) {
 }
 
 function PortfolioExperience({ activeTheme, onSwitchTheme }) {
-  const { C, F, MOTION } = useThemeTokens();
+  const { theme, C, F, MOTION, UI } = useThemeTokens();
+  const isGameverse = theme.id === "pop";
   const { assets, content, sections } = activeTheme;
   const HOME_CONTENT = content.home;
-  const ABOUT_STATS = content.about.stats;
-  const ABOUT_BLURB = content.about.blurb;
-  const SKILL_GROUPS = content.skills;
-  const PROJECTS = content.projects;
+  const ABOUT_CONTENT = content.about;
+  const SKILLS_CONTENT = content.skills;
+  const PROJECTS_CONTENT = content.projects;
   const CONTACT_CONTENT = content.contact;
+  const CONTROLS_CONTENT = content.controls;
   const sectionPoints = useMemo(() => getSectionPoints(sections), [sections]);
   const initialSpriteX = 10;
   const [viewportWidth, setViewportWidth] = useState(
@@ -766,6 +1026,16 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
       pressedKeysRef.current.add(key);
       window.clearTimeout(actionTimerRef.current);
 
+      if (
+        (key === "a" || key === "d") &&
+        (pressedKeysRef.current.has("s") ||
+          pressedKeysRef.current.has("w") ||
+          characterAction === "crouch" ||
+          characterAction === "jump")
+      ) {
+        return;
+      }
+
       if (key === "a") {
         moveToSectionPoint(-1);
       } else if (key === "d") {
@@ -774,18 +1044,24 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
         setCharacterAction("crouch");
       } else if (key === "w") {
         setCharacterAction("jump");
-        actionTimerRef.current = window.setTimeout(endTransientAction, 520);
-      } else if (key === "e") {
-        setCharacterAction(
-          pressedKeysRef.current.has("s")
-            ? pickRandomAction([
-                "crouchAttack1",
-                "crouchAttack2",
-                "crouchAttack3",
-              ])
-            : pickRandomAction(["attack1", "attack2", "attack3"])
+        actionTimerRef.current = window.setTimeout(
+          endTransientAction,
+          getActionDuration(activeTheme, "jump")
         );
-        actionTimerRef.current = window.setTimeout(endTransientAction, 420);
+      } else if (key === "e") {
+        const attackAction = pressedKeysRef.current.has("s")
+          ? pickRandomAction([
+              "crouchAttack1",
+              "crouchAttack2",
+              "crouchAttack3",
+            ])
+          : pickRandomAction(["attack1", "attack2", "attack3"]);
+
+        setCharacterAction(attackAction);
+        actionTimerRef.current = window.setTimeout(
+          endTransientAction,
+          getActionDuration(activeTheme, attackAction)
+        );
       }
     };
 
@@ -841,7 +1117,13 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
       window.removeEventListener("keydown", onActionKeyDown);
       window.removeEventListener("keyup", onActionKeyUp);
     };
-  }, [characterAction, sectionPoints, sections.length, triggerTransition]);
+  }, [
+    activeTheme,
+    characterAction,
+    sectionPoints,
+    sections.length,
+    triggerTransition,
+  ]);
 
   const handleContactSubmit = useCallback(
     async (event) => {
@@ -893,8 +1175,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
         height: "100vh",
         overflow: "hidden",
         position: "relative",
-        background:
-          "radial-gradient(circle at top, rgba(216,90,26,0.22) 0%, rgba(216,90,26,0) 36%), linear-gradient(180deg, #34150d 0%, #160b08 38%, #090606 100%)",
+        background: UI.appBackground,
         fontFamily: F.body,
         color: C.text,
         opacity: isThemeMounted ? 1 : 0,
@@ -904,7 +1185,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&family=Teko:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Oxanium:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap');
         @font-face {
           font-family: 'NinjaNaruto';
           src: url('/njnaruto.ttf') format('truetype');
@@ -919,16 +1200,312 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           cursor: url('${assets.ui.focusCursor}') 8 8, pointer !important;
         }
         a { color: inherit; }
+        .gameverse-card {
+          isolation: isolate;
+        }
+        .gameverse-nav {
+          position: relative;
+          overflow: hidden;
+          backdrop-filter: blur(16px) saturate(135%);
+          -webkit-backdrop-filter: blur(16px) saturate(135%);
+          border-bottom: 1px solid rgba(255,70,85,0.7);
+          box-shadow:
+            0 0 0 1px rgba(255,70,85,0.08) inset,
+            0 10px 40px rgba(0,0,0,0.28);
+          animation: gvNavPulse 3.8s ease-in-out infinite;
+        }
+        .gameverse-nav::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            repeating-linear-gradient(
+              180deg,
+              rgba(255,255,255,0.035) 0,
+              rgba(255,255,255,0.035) 1px,
+              rgba(255,255,255,0) 1px,
+              rgba(255,255,255,0) 4px
+            );
+          mix-blend-mode: screen;
+          opacity: 0.28;
+          pointer-events: none;
+        }
+        .gameverse-nav-button {
+          position: relative;
+          border-radius: 0 !important;
+          border-top: 2px solid transparent !important;
+          border-left: 0 !important;
+          border-right: 0 !important;
+          border-bottom: 0 !important;
+          padding-top: 0.58rem !important;
+          padding-bottom: 0.52rem !important;
+          background: rgba(255,255,255,0.01) !important;
+          transform: skewX(-10deg);
+        }
+        .gameverse-nav-button + .gameverse-nav-button::before {
+          content: "";
+          position: absolute;
+          left: -0.18rem;
+          top: 22%;
+          bottom: 22%;
+          width: 1px;
+          background: linear-gradient(180deg, transparent, rgba(255,70,85,0.45), transparent);
+          pointer-events: none;
+        }
+        .gameverse-nav-button.is-active {
+          border-top-color: ${C.ember} !important;
+          box-shadow: inset 0 1px 0 rgba(255,70,85,0.42), 0 -8px 20px rgba(255,70,85,0.05) inset;
+        }
+        .gameverse-nav-label {
+          position: relative;
+          display: inline-block;
+          transform: skewX(10deg);
+          transition: text-shadow 140ms ease, transform 140ms ease;
+        }
+        .gameverse-nav-button:hover .gameverse-nav-label {
+          text-shadow:
+            0.8px 0 0 rgba(255,70,85,0.62),
+            -0.8px 0 0 rgba(97,218,251,0.34);
+          animation: gvGlitch 180ms steps(2, end) 1;
+        }
+        .gameverse-nav-dot {
+          display: inline-block;
+          width: 7px;
+          height: 7px;
+          margin-left: 0.45rem;
+          border-radius: 999px;
+          background: ${C.ember};
+          box-shadow: 0 0 10px rgba(255,70,85,0.85);
+          animation: gvPulseDot 1.15s ease-in-out infinite;
+          vertical-align: middle;
+        }
+        .gameverse-hud-button {
+          position: relative;
+          border: 1px solid transparent !important;
+          background: rgba(255,70,85,0.06) !important;
+          overflow: hidden;
+          transition:
+            color 140ms ease,
+            background-color 140ms ease,
+            text-shadow 140ms ease,
+            transform 140ms ease;
+        }
+        .gameverse-hud-button::before,
+        .gameverse-hud-button::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .gameverse-hud-button::before {
+          background:
+            linear-gradient(${C.ember}, ${C.ember}) top left / 16px 2px no-repeat,
+            linear-gradient(${C.ember}, ${C.ember}) top left / 2px 16px no-repeat,
+            linear-gradient(${C.gold}, ${C.gold}) bottom right / 16px 2px no-repeat,
+            linear-gradient(${C.gold}, ${C.gold}) bottom right / 2px 16px no-repeat;
+          opacity: 0.95;
+        }
+        .gameverse-hud-button::after {
+          background:
+            linear-gradient(${C.gold}, ${C.gold}) top right / 12px 2px no-repeat,
+            linear-gradient(${C.gold}, ${C.gold}) top right / 2px 12px no-repeat,
+            linear-gradient(${C.ember}, ${C.ember}) bottom left / 12px 2px no-repeat,
+            linear-gradient(${C.ember}, ${C.ember}) bottom left / 2px 12px no-repeat;
+          opacity: 0.7;
+        }
+        .gameverse-hud-button:hover {
+          color: #6fffe9 !important;
+          text-shadow:
+            0.8px 0 0 rgba(255,70,85,0.52),
+            -0.8px 0 0 rgba(111,255,233,0.45);
+          transform: translateY(-1px);
+          animation: gvGlitch 180ms steps(2, end) 1;
+          background: rgba(255,70,85,0.12) !important;
+        }
+        .gameverse-boot::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, rgba(255, 70, 85, 0.05), transparent 20%, transparent 82%, rgba(255, 70, 85, 0.035)),
+            radial-gradient(circle at top right, rgba(255, 70, 85, 0.08), transparent 28%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        .gv-corner {
+          position: absolute;
+          width: 38px;
+          height: 38px;
+          z-index: 3;
+          pointer-events: none;
+          opacity: 0.8;
+          filter: drop-shadow(0 0 8px rgba(255, 70, 85, 0.28));
+          animation: gvBootFlicker 2.8s steps(2, end) infinite;
+        }
+        .gv-corner::before,
+        .gv-corner::after {
+          content: "";
+          position: absolute;
+          background: linear-gradient(90deg, ${C.ember}, ${C.gold});
+          box-shadow: 0 0 10px rgba(255, 70, 85, 0.32);
+        }
+        .gv-corner::before { width: 100%; height: 2px; }
+        .gv-corner::after { width: 2px; height: 100%; }
+        .gv-corner-tl { top: 14px; left: 14px; }
+        .gv-corner-tl::before { top: 0; left: 0; }
+        .gv-corner-tl::after { top: 0; left: 0; }
+        .gv-corner-tr { top: 14px; right: 14px; }
+        .gv-corner-tr::before { top: 0; right: 0; }
+        .gv-corner-tr::after { top: 0; right: 0; }
+        .gv-corner-bl { bottom: 14px; left: 14px; }
+        .gv-corner-bl::before { bottom: 0; left: 0; }
+        .gv-corner-bl::after { bottom: 0; left: 0; }
+        .gv-corner-br { bottom: 14px; right: 14px; }
+        .gv-corner-br::before { bottom: 0; right: 0; }
+        .gv-corner-br::after { bottom: 0; right: 0; }
+        .gameverse-scanline {
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 72px;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0),
+              rgba(255, 255, 255, 0.04) 35%,
+              rgba(255, 70, 85, 0.08) 50%,
+              rgba(255, 255, 255, 0.03) 65%,
+              rgba(255, 255, 255, 0)
+            );
+          mix-blend-mode: screen;
+          pointer-events: none;
+          z-index: 2;
+          animation: gvScan 5.2s linear infinite;
+        }
+        .gameverse-particles {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .gameverse-pixel {
+          position: absolute;
+          left: var(--x);
+          bottom: -10px;
+          width: var(--size);
+          height: var(--size);
+          background: rgba(255, 255, 255, 0.72);
+          box-shadow: 0 0 6px rgba(255,255,255,0.2);
+          opacity: 0;
+          animation: gvRise var(--duration) linear infinite;
+          animation-delay: var(--delay);
+        }
+        .gameverse-stat {
+          position: relative;
+          border-color: rgba(255, 70, 85, 0.22) !important;
+          background:
+            radial-gradient(circle at 20% 20%, rgba(255, 70, 85, 0.05), transparent 38%),
+            radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px),
+            rgba(10, 15, 24, 0.56) !important;
+          background-size: auto, 10px 10px, auto !important;
+          backdrop-filter: blur(10px) saturate(120%);
+          -webkit-backdrop-filter: blur(10px) saturate(120%);
+          transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            background-color 180ms ease,
+            transform 180ms ease;
+        }
+        .gameverse-stat:hover {
+          border-color: rgba(255, 70, 85, 0.72) !important;
+          box-shadow:
+            0 0 0 1px rgba(255, 70, 85, 0.18) inset,
+            0 0 18px rgba(255, 70, 85, 0.16),
+            0 0 28px rgba(255, 70, 85, 0.1);
+          transform: translateY(-1px);
+        }
+        .gameverse-stat-label {
+          text-shadow:
+            0.6px 0 0 rgba(255, 70, 85, 0.45),
+            -0.6px 0 0 rgba(90, 180, 255, 0.28),
+            0 0 8px rgba(255, 209, 102, 0.08);
+        }
+        .gameverse-stat-value {
+          color: #6fffe9;
+          text-shadow: 0 0 12px rgba(111,255,233,0.14);
+        }
+        .gameverse-theme-button {
+          border-top-color: rgba(255,70,85,0.32) !important;
+        }
+        @keyframes gvGlitch {
+          0% { transform: translateX(0); }
+          33% { transform: translateX(1px); }
+          66% { transform: translateX(-1px); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes gvPulseDot {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.35); opacity: 1; }
+        }
+        @keyframes gvNavPulse {
+          0%, 100% { box-shadow: 0 0 0 1px rgba(255,70,85,0.08) inset, 0 10px 40px rgba(0,0,0,0.28), 0 1px 0 rgba(255,70,85,0.22); }
+          50% { box-shadow: 0 0 0 1px rgba(255,70,85,0.12) inset, 0 10px 40px rgba(0,0,0,0.28), 0 1px 0 rgba(255,70,85,0.42); }
+        }
+        @keyframes gvBootFlicker {
+          0%, 100% { opacity: 0.78; }
+          8% { opacity: 0.35; }
+          10% { opacity: 0.92; }
+          14% { opacity: 0.45; }
+          18% { opacity: 0.85; }
+          60% { opacity: 0.74; }
+        }
+        @keyframes gvScan {
+          0% { transform: translateY(-120%); opacity: 0; }
+          8% { opacity: 1; }
+          92% { opacity: 1; }
+          100% { transform: translateY(900%); opacity: 0; }
+        }
+        @keyframes gvRise {
+          0% { transform: translateY(0); opacity: 0; }
+          12% { opacity: 0.65; }
+          100% { transform: translateY(-120%); opacity: 0; }
+        }
+        @media (max-width: 768px) {
+          .gv-corner {
+            width: 26px;
+            height: 26px;
+          }
+          .gv-corner-tl,
+          .gv-corner-tr {
+            top: 10px;
+          }
+          .gv-corner-bl,
+          .gv-corner-br {
+            bottom: 10px;
+          }
+          .gv-corner-tl,
+          .gv-corner-bl {
+            left: 10px;
+          }
+          .gv-corner-tr,
+          .gv-corner-br {
+            right: 10px;
+          }
+          .gameverse-scanline {
+            height: 56px;
+          }
+        }
       `}</style>
 
       <div
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `linear-gradient(180deg, rgba(12,8,6,0.22), rgba(8,6,5,0.48)), url(${assets.sectionBackgrounds[displayIdx]})`,
+          backgroundImage: `${UI.backgroundImageOverlay}, url(${assets.sectionBackgrounds[displayIdx]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "brightness(0.88) saturate(0.95)",
+          filter: UI.backgroundFilter,
           transform: "scale(1.03)",
         }}
       />
@@ -936,8 +1513,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "radial-gradient(circle at 50% 18%, rgba(239,197,108,0.22) 0, rgba(239,197,108,0.08) 10%, rgba(239,197,108,0) 21%), linear-gradient(180deg, rgba(219,108,43,0.08) 0%, rgba(36,17,11,0.03) 30%, rgba(6,5,5,0.08) 100%)",
+          background: UI.topAtmosphere,
         }}
       />
       <div
@@ -945,8 +1521,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           position: "absolute",
           inset: 0,
           opacity: 0.45,
-          backgroundImage:
-            "linear-gradient(rgba(239,197,108,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(239,197,108,0.05) 1px, transparent 1px)",
+          backgroundImage: UI.gridOverlay,
           backgroundSize: "84px 84px",
           maskImage:
             "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2))",
@@ -957,8 +1532,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           position: "absolute",
           inset: "auto 0 0 0",
           height: "45vh",
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(24,35,17,0.78) 20%, rgba(15,21,10,0.98) 100%)",
+          background: UI.bottomAtmosphere,
           clipPath:
             "polygon(0 55%, 12% 40%, 21% 58%, 34% 36%, 46% 56%, 57% 32%, 71% 53%, 82% 34%, 100% 60%, 100% 100%, 0 100%)",
         }}
@@ -966,6 +1540,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
       <ThreeScene sectionIndex={displayIdx} />
 
       <nav
+        className={isGameverse ? "gameverse-nav" : undefined}
         style={{
           position: "fixed",
           top: isMobile ? "0.55rem" : "1.2rem",
@@ -978,7 +1553,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           padding: isMobile ? "0.55rem 0.6rem" : "0.75rem 1rem",
           borderRadius: isMobile ? "18px" : "999px",
           border: `1px solid ${C.line}`,
-          background: C.smoke,
+          background: UI.navBackground,
           backdropFilter: "blur(14px)",
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
@@ -1011,10 +1586,15 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
         >
           <button
             onClick={onSwitchTheme}
+            className={
+              isGameverse
+                ? "gameverse-nav-button gameverse-theme-button"
+                : undefined
+            }
             style={{
               borderRadius: "999px",
               border: `1px solid ${C.line}`,
-              background: "rgba(239,197,108,0.08)",
+              background: UI.themeButtonBackground,
               color: C.sand,
               padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
               textTransform: "uppercase",
@@ -1026,12 +1606,19 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               flex: "0 0 auto",
             }}
           >
-            Themes
+            {CONTROLS_CONTENT.switchTheme}
           </button>
           {sections.map((section, idx) => (
             <button
               key={section}
               onClick={() => triggerTransition(idx)}
+              className={
+                isGameverse
+                  ? `gameverse-nav-button ${
+                      idx === sectionIdx ? "is-active" : ""
+                    }`
+                  : undefined
+              }
               style={{
                 borderRadius: "999px",
                 border: `1px solid ${
@@ -1049,7 +1636,12 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 fontSize: isMobile ? "0.82rem" : "1rem",
               }}
             >
-              {section}
+              <span className={isGameverse ? "gameverse-nav-label" : undefined}>
+                {section}
+              </span>
+              {isGameverse && idx === sectionIdx ? (
+                <span className="gameverse-nav-dot" aria-hidden="true" />
+              ) : null}
             </button>
           ))}
         </div>
@@ -1132,6 +1724,9 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     <button
                       key={label}
                       onClick={() => triggerTransition(idx)}
+                      className={
+                        isGameverse ? "gameverse-hud-button" : undefined
+                      }
                       style={{
                         padding: "0.8rem 1.15rem",
                         borderRadius: "999px",
@@ -1164,13 +1759,13 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     borderRadius: "28px",
                     overflow: "hidden",
                     border: `1px solid ${C.line}`,
-                    background: "rgba(255,255,255,0.04)",
+                    background: UI.mediaFrameBackground,
                     boxShadow: "0 18px 50px rgba(0,0,0,0.3)",
                   }}
                 >
                   <img
                     src={assets.heroProfile}
-                    alt="Naruto portrait"
+                    alt={`${activeTheme.label} portrait`}
                     style={{
                       width: "100%",
                       height: "100%",
@@ -1188,8 +1783,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
 
         {displayIdx === 1 && (
           <SectionShell
-            title="Ninja Profile"
-            kicker="Character Sheet"
+            title={ABOUT_CONTENT.title}
+            kicker={ABOUT_CONTENT.kicker}
             isMobile={isMobile}
           >
             <div
@@ -1199,7 +1794,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 gap: "0.9rem",
               }}
             >
-              {ABOUT_STATS.map(([label, value]) => (
+              {ABOUT_CONTENT.stats.map(([label, value]) => (
                 <StatCard key={label} label={label} value={value} />
               ))}
             </div>
@@ -1212,15 +1807,15 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 fontSize: "1rem",
               }}
             >
-              {ABOUT_BLURB}
+              {ABOUT_CONTENT.blurb}
             </div>
           </SectionShell>
         )}
 
         {displayIdx === 2 && (
           <SectionShell
-            title="Jutsu Arsenal"
-            kicker="Power Levels"
+            title={SKILLS_CONTENT.title}
+            kicker={SKILLS_CONTENT.kicker}
             isMobile={isMobile}
           >
             <div
@@ -1230,7 +1825,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 gap: "1.6rem",
               }}
             >
-              {SKILL_GROUPS.map((group) => (
+              {SKILLS_CONTENT.groups.map((group) => (
                 <div key={group.title}>
                   <p
                     style={{
@@ -1258,8 +1853,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
 
         {displayIdx === 3 && (
           <SectionShell
-            title="Mission Board"
-            kicker="Recent Arcs"
+            title={PROJECTS_CONTENT.title}
+            kicker={PROJECTS_CONTENT.kicker}
             isMobile={isMobile}
           >
             <div
@@ -1271,7 +1866,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 gap: "1rem",
               }}
             >
-              {PROJECTS.map((project) => (
+              {PROJECTS_CONTENT.items.map((project) => (
                 <MissionCard key={project.title} {...project} />
               ))}
             </div>
@@ -1292,7 +1887,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               <input
                 type="hidden"
                 name="_subject"
-                value="New portfolio message for Nakshatra-kun"
+                value={CONTACT_CONTENT.subject}
               />
               <input type="hidden" name="_template" value="table" />
               <input type="hidden" name="_captcha" value="false" />
@@ -1312,7 +1907,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
                   padding: "0.95rem 1rem",
-                  background: "rgba(255,255,255,0.04)",
+                  background: UI.inputBackground,
                   color: C.text,
                 }}
               />
@@ -1325,7 +1920,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
                   padding: "0.95rem 1rem",
-                  background: "rgba(255,255,255,0.04)",
+                  background: UI.inputBackground,
                   color: C.text,
                 }}
               />
@@ -1338,7 +1933,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   borderRadius: "16px",
                   border: `1px solid ${C.line}`,
                   padding: "0.95rem 1rem",
-                  background: "rgba(255,255,255,0.04)",
+                  background: UI.inputBackground,
                   color: C.text,
                   resize: "none",
                 }}
@@ -1358,7 +1953,9 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   opacity: contactState === "loading" ? 0.7 : 1,
                 }}
               >
-                {contactState === "loading" ? "Summoning..." : "Summon Contact"}
+                {contactState === "loading"
+                  ? CONTACT_CONTENT.loadingLabel
+                  : CONTACT_CONTENT.submitLabel}
               </button>
               {contactState !== "idle" && (
                 <div
@@ -1375,10 +1972,10 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     }`,
                     background:
                       contactState === "success"
-                        ? "linear-gradient(180deg, rgba(76,58,20,0.75) 0%, rgba(48,31,12,0.9) 100%)"
+                        ? UI.contactSuccessBackground
                         : contactState === "error"
-                        ? "linear-gradient(180deg, rgba(89,26,16,0.75) 0%, rgba(52,18,12,0.9) 100%)"
-                        : "linear-gradient(180deg, rgba(73,37,19,0.75) 0%, rgba(42,22,12,0.88) 100%)",
+                        ? UI.contactErrorBackground
+                        : UI.contactPendingBackground,
                     color: contactState === "error" ? "#ffd7c9" : C.sand,
                     lineHeight: 1.6,
                   }}
@@ -1392,10 +1989,10 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     }}
                   >
                     {contactState === "success"
-                      ? "Mission Complete"
+                      ? CONTACT_CONTENT.status.success
                       : contactState === "error"
-                      ? "Transmission Failed"
-                      : "Shadow Clone Jutsu"}
+                      ? CONTACT_CONTENT.status.error
+                      : CONTACT_CONTENT.status.pending}
                   </div>
                   <div style={{ fontSize: "0.92rem" }}>{contactMessage}</div>
                 </div>
@@ -1422,8 +2019,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               position: "absolute",
               inset: isMobile ? "auto 0 12px 0" : "auto 0 18px 0",
               height: isMobile ? "16px" : "22px",
-              background:
-                "linear-gradient(90deg, rgba(0,0,0,0), rgba(239,197,108,0.4), rgba(216,90,26,0.52), rgba(239,197,108,0.4), rgba(0,0,0,0))",
+              background: UI.groundGlow,
               boxShadow: "0 0 28px rgba(216,90,26,0.2)",
             }}
           />
@@ -1452,8 +2048,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 padding: "0.65rem 0.85rem",
                 borderRadius: "14px 20px 14px 18px",
                 border: `1px solid ${C.line}`,
-                background:
-                  "linear-gradient(180deg, rgba(62,31,18,0.95) 0%, rgba(28,15,10,0.96) 100%)",
+                background: UI.helpTooltipBackground,
                 boxShadow: "0 16px 40px rgba(0,0,0,0.32)",
                 color: C.sand,
                 whiteSpace: "nowrap",
@@ -1463,9 +2058,9 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               }}
             >
               <div style={{ fontFamily: F.display, color: C.gold }}>
-                `WASD` Move • `E` Attack
+                {CONTROLS_CONTENT.helpTitle}
               </div>
-              <div>Hold `S` to crouch or crouch-walk</div>
+              <div>{CONTROLS_CONTENT.helpText}</div>
             </div>
             <div
               style={{
