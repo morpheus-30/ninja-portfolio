@@ -21,12 +21,12 @@ export const SITE_ASSETS = {
 
 export const HOME_CONTENT = {
   kicker: "Leaf Village Tech Division",
-  title: "Shinobi Software Engineer",
+  title: "Software Engineer",
   intro:
-    "Nakshatra-kun is an Associate Software Engineer crafting real-world systems across Python, Flutter, SAP, and modern developer tooling.",
+    "Associate Software Engineer building practical systems across Python, Flutter, SAP, and developer tooling.",
   paragraphs: [
-    "Currently deployed at Yamaha Motor Solutions India Pvt. Ltd. since January 2025, after graduating from J.C. Bose University of Science and Technology, YMCA. My work revolves around building enterprise-grade systems while balancing cloud-native thinking, API-first design, and practical system behavior.",
-    "My primary arsenal includes Python, Flutter, and SAP, with additional exploration in Go, FastAPI, JavaScript, and C++. I focus on rapid prototyping, iterative development, and using AI as a support tool—while staying grounded in system design, constraints, and real execution.",
+    "Currently at Yamaha Motor Solutions India, focused on enterprise systems, API-first design, and reliable execution with a practical engineering mindset.",
+    "Primary stack includes Python, Flutter, and SAP, with hands-on exploration in Go, FastAPI, JavaScript, and C++.",
   ],
   ctas: [
     ["View Missions", 3],

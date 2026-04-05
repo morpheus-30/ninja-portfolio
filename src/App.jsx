@@ -24,6 +24,15 @@ const SECTION_POINTS = SECTIONS.map(
   (_, index) => 10 + (index / (SECTIONS.length - 1)) * 80
 );
 
+function isTypingTarget(target) {
+  if (!(target instanceof HTMLElement)) return false;
+
+  if (target.isContentEditable) return true;
+
+  const tagName = target.tagName;
+  return tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
+}
+
 function ThreeScene({ sectionIndex }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -216,7 +225,13 @@ function NarutoWalker({ action, direction, isMobile }) {
   );
 }
 
-function SectionShell({ title, kicker, children, isMobile }) {
+function SectionShell({
+  title,
+  kicker,
+  children,
+  isMobile,
+  titleStyle,
+}) {
   return (
     <section
       style={{
@@ -296,6 +311,7 @@ function SectionShell({ title, kicker, children, isMobile }) {
             marginBottom: isMobile ? "0.9rem" : "1.25rem",
             textTransform: "uppercase",
             letterSpacing: "0.04em",
+            ...titleStyle,
           }}
         >
           {title}
@@ -455,6 +471,7 @@ export default function Portfolio() {
   const contactFormRef = useRef(null);
   const pressedKeysRef = useRef(new Set());
   const isMobile = viewportWidth < 768;
+  const isCompactHero = !isMobile && viewportWidth < 1180;
 
   const triggerTransition = useCallback((nextIdx) => {
     if (
@@ -604,6 +621,9 @@ export default function Portfolio() {
     const onActionKeyDown = (event) => {
       const key = event.key.toLowerCase();
       if (!["w", "a", "s", "d", "e"].includes(key)) return;
+      if (isTypingTarget(event.target) || isTypingTarget(document.activeElement)) {
+        return;
+      }
 
       if (["w", "a", "s", "d"].includes(key)) {
         event.preventDefault();
@@ -630,6 +650,9 @@ export default function Portfolio() {
     const onActionKeyUp = (event) => {
       const key = event.key.toLowerCase();
       if (!["w", "a", "s", "d", "e"].includes(key)) return;
+      if (isTypingTarget(event.target) || isTypingTarget(document.activeElement)) {
+        return;
+      }
       pressedKeysRef.current.delete(key);
 
       if (
@@ -874,18 +897,26 @@ export default function Portfolio() {
             title={HOME_CONTENT.title}
             kicker={HOME_CONTENT.kicker}
             isMobile={isMobile}
+            titleStyle={{
+              fontSize: isMobile
+                ? "clamp(1.9rem, 10vw, 2.8rem)"
+                : isCompactHero
+                  ? "clamp(2rem, 3.8vw, 3.4rem)"
+                  : "clamp(2.2rem, 4.5vw, 4rem)",
+              lineHeight: isMobile ? 1 : 0.98,
+            }}
           >
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: isMobile
+                gridTemplateColumns: isMobile || isCompactHero
                   ? "minmax(0, 1fr)"
                   : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
                 gap: isMobile ? "1rem" : "1.6rem",
-                alignItems: "center",
+                alignItems: isMobile || isCompactHero ? "start" : "center",
               }}
             >
-              <div style={{ maxWidth: "720px" }}>
+              <div style={{ maxWidth: isCompactHero ? "100%" : "720px" }}>
                 <p
                   style={{
                     fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
@@ -943,7 +974,11 @@ export default function Portfolio() {
               <div
                 style={{
                   justifySelf: "center",
-                  width: isMobile ? "min(100%, 220px)" : "min(100%, 290px)",
+                  width: isMobile
+                    ? "min(100%, 220px)"
+                    : isCompactHero
+                      ? "min(100%, 240px)"
+                      : "min(100%, 290px)",
                   aspectRatio: "4 / 5",
                   borderRadius: "28px",
                   overflow: "hidden",
