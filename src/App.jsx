@@ -83,7 +83,7 @@ function getActionDuration(theme, action) {
 }
 
 function ThreeScene({ sectionIndex }) {
-  const { theme, C } = useThemeTokens();
+  const { theme } = useThemeTokens();
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -224,7 +224,7 @@ function ThreeScene({ sectionIndex }) {
       if (mount.contains(renderer.domElement))
         mount.removeChild(renderer.domElement);
     };
-  }, [C.gold, theme.assets.ui.particleSprite]);
+  }, [theme.assets.ui.particleSprite, theme.id]);
 
   useEffect(() => {
     const scene = sceneRef.current;
