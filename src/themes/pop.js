@@ -5,7 +5,7 @@ export const popTheme = {
   label: "Gameverse",
   description:
     "A high-energy gamer world with arcade, shooter, and action UI vibes.",
-  selectorImage: "/assets/themes/pop/backgrounds/home.jpg",
+  selectorImage: "/assets/themes/pop/backgrounds/thumbnail.jpg",
   design: {
     colors: {
       ink: "#05070c",
@@ -23,7 +23,7 @@ export const popTheme = {
     },
     fonts: {
       body: "'Rajdhani', 'Oxanium', sans-serif",
-      display: "'Teko', 'Rajdhani', sans-serif",
+      display: "'PixelGame', 'Cinzel', 'Teko', serif",
     },
     motion: {
       swapDelayMs: 380,
@@ -41,25 +41,25 @@ export const popTheme = {
     },
     chrome: {
       appBackground:
-        "radial-gradient(circle at top, rgba(255,70,85,0.12) 0%, rgba(255,70,85,0) 26%), linear-gradient(180deg, #090c14 0%, #0a1018 46%, #040508 100%)",
+        "radial-gradient(circle at top, rgba(216,181,122,0.16) 0%, rgba(216,181,122,0) 28%), linear-gradient(180deg, #120f0b 0%, #17120d 44%, #080604 100%)",
       backgroundImageOverlay:
-        "linear-gradient(180deg, rgba(4,7,12,0.08), rgba(3,5,8,0.66))",
-      backgroundFilter: "brightness(0.72) saturate(0.9) contrast(1.05)",
+        "radial-gradient(circle at 50% -6%, rgba(223,191,133,0.16) 0%, rgba(223,191,133,0.05) 18%, rgba(0,0,0,0) 38%), linear-gradient(180deg, rgba(18,14,10,0.06) 0%, rgba(18,15,11,0.2) 38%, rgba(8,6,4,0.56) 100%)",
+      backgroundFilter: "brightness(0.8) saturate(0.92) contrast(1.03)",
       topAtmosphere:
-        "linear-gradient(135deg, rgba(255,70,85,0.22) 0%, rgba(255,70,85,0.22) 18%, rgba(0,0,0,0) 18%), linear-gradient(315deg, rgba(12,20,32,0.8) 0%, rgba(12,20,32,0.34) 40%, rgba(0,0,0,0) 40%), radial-gradient(circle at 74% 24%, rgba(255,209,102,0.14) 0%, rgba(255,209,102,0.03) 12%, rgba(0,0,0,0) 26%)",
+        "radial-gradient(circle at 50% 12%, rgba(229,200,145,0.34) 0%, rgba(229,200,145,0.14) 11%, rgba(229,200,145,0.03) 23%, rgba(0,0,0,0) 34%), radial-gradient(circle at 22% 18%, rgba(168,131,83,0.16) 0%, rgba(168,131,83,0.05) 14%, rgba(0,0,0,0) 34%), radial-gradient(circle at 78% 20%, rgba(142,108,66,0.14) 0%, rgba(142,108,66,0.05) 12%, rgba(0,0,0,0) 30%), linear-gradient(180deg, rgba(34,25,16,0.16) 0%, rgba(20,16,11,0.1) 28%, rgba(0,0,0,0) 56%)",
       gridOverlay:
-        "linear-gradient(rgba(255,70,85,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,70,85,0.04) 1px, transparent 1px)",
+        "linear-gradient(rgba(212,178,126,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(212,178,126,0.04) 1px, transparent 1px)",
       bottomAtmosphere:
-        "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(8,13,20,0.58) 16%, rgba(3,4,7,0.98) 100%)",
-      sectionBorder: "2px solid rgba(255, 70, 85, 0.58)",
+        "radial-gradient(ellipse at 50% 110%, rgba(179,141,91,0.24) 0%, rgba(179,141,91,0.12) 22%, rgba(179,141,91,0.03) 40%, rgba(0,0,0,0) 60%), linear-gradient(180deg, rgba(24,19,12,0) 0%, rgba(18,15,11,0.38) 18%, rgba(10,8,6,0.76) 58%, rgba(4,3,2,0.98) 100%)",
+      sectionBorder: "4px solid rgba(96, 82, 62, 0.9)",
       sectionBackground:
-        "linear-gradient(180deg, rgba(12,15,22,0.96) 0%, rgba(18,22,30,0.94) 42%, rgba(9,11,16,0.98) 100%)",
+        "linear-gradient(180deg, rgba(113,82,50,0.48) 0%, rgba(88,60,35,0.54) 48%, rgba(64,42,23,0.6) 100%)",
       sectionShadow:
-        "0 0 60px rgba(255,70,85,0.08), 0 30px 90px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,70,85,0.05), inset 0 14px 32px rgba(255,70,85,0.04)",
+        "0 24px 80px rgba(0,0,0,0.42), inset 0 0 0 2px rgba(193,168,129,0.18), inset 0 1px 0 rgba(255,236,203,0.12), inset 0 -18px 28px rgba(44,24,10,0.3)",
       sectionTopBar:
-        "linear-gradient(90deg, rgba(0,0,0,0), rgba(255,70,85,0.14), rgba(255,70,85,0.62), rgba(255,209,102,0.18), rgba(0,0,0,0))",
+        "linear-gradient(90deg, rgba(0,0,0,0), rgba(204,168,113,0.36), rgba(118,86,52,0.86), rgba(204,168,113,0.3), rgba(0,0,0,0))",
       sectionGrid:
-        "linear-gradient(rgba(255,70,85,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,70,85,0.07) 1px, transparent 1px)",
+        "linear-gradient(rgba(255,222,173,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(83,54,29,0.08) 1px, transparent 1px)",
       statCardBorder: "1px solid rgba(255, 70, 85, 0.34)",
       statCardBackground:
         "linear-gradient(180deg, rgba(14,21,33,0.88) 0%, rgba(8,10,17,0.96) 100%)",
@@ -91,6 +91,15 @@ export const popTheme = {
       emblem: "/assets/themes/pop/ui/cursor-48.png?v=3",
       focusEmblem: "/assets/themes/pop/ui/hover-48.png?v=3",
       loader: "/assets/themes/pop/ui/loader.gif",
+      heartFull: "/assets/themes/pop/ui/full.png",
+      heartHalf: "/assets/themes/pop/ui/half.png",
+      heartEmpty: "/assets/themes/pop/ui/empty.png",
+      particleSprite: "/assets/themes/pop/ui/star.png",
+      stoneTile: "/assets/themes/pop/ui/stonebg.jpg",
+      stoneSprite: "/assets/themes/pop/ui/stone.png",
+      logSprite: "/assets/themes/pop/ui/log.png",
+      scrollSprite: "/assets/themes/pop/ui/scroll.png",
+      treasureSprite: "/assets/themes/pop/ui/treasure.png",
     },
     character: {
       idle: "/assets/themes/pop/character/idle.gif",
@@ -105,7 +114,7 @@ export const popTheme = {
       crouchWalk: "/assets/themes/pop/character/run.gif",
       run: "/assets/themes/pop/character/run.gif",
     },
-    heroProfile: "/assets/themes/pop/backgrounds/home.jpg",
+    heroProfile: "/assets/themes/pop/backgrounds/pfp.jpeg",
     sectionBackgrounds: [
       "/assets/themes/pop/backgrounds/home.jpg",
       "/assets/themes/pop/backgrounds/about.jpg",
@@ -116,62 +125,91 @@ export const popTheme = {
   },
   content: {
     home: {
-      kicker: "Player One Interface",
-      title: sharedPortfolioContent.home.title,
-      intro: sharedPortfolioContent.home.intro,
-      paragraphs: sharedPortfolioContent.home.paragraphs,
+      kicker: "Insert Coin",
+      title: "Player One Engineer",
+      intro:
+        "Software engineer building reliable systems like a long-form campaign: steady mechanics, clean logic, and builds that hold up after launch.",
+      paragraphs: [
+        "Currently grinding at Yamaha Motor Solutions India, shipping enterprise-focused systems with an API-first mindset, practical architecture, and a strong bias toward smooth execution.",
+        "Main loadout includes Python, Flutter, SAP, FastAPI, JavaScript, Go, and C++, with a focus on creating tools and workflows that feel responsive, scalable, and fun to use.",
+      ],
       ctas: [
-        ["Open Missions", 3],
-        ["Player Profile", 1],
-        ["Queue Contact", 4],
+        ["Start Missions", 3],
+        ["View CHARACTER SELECT", 1],
+        ["Open Lobby", 4],
       ],
     },
     about: {
-      title: "Player Profile",
-      kicker: "Character Sheet",
+      title: "CHARACTER SELECT",
+      kicker: "Player Stats",
       stats: [
-        ["Name", sharedPortfolioContent.profile.name],
-        ["Alliance", sharedPortfolioContent.profile.alliance],
-        ["Base", sharedPortfolioContent.profile.village],
-        ["Role", sharedPortfolioContent.profile.rank],
-        ["Loadout", sharedPortfolioContent.profile.techniques],
-        ["Experience", sharedPortfolioContent.profile.experience],
-        ["Current Match", sharedPortfolioContent.profile.currentArc],
+        ["Player Tag", sharedPortfolioContent.profile.name],
+        ["Guild", sharedPortfolioContent.profile.alliance],
+        ["Spawn Point", sharedPortfolioContent.profile.village],
+        ["Class", sharedPortfolioContent.profile.rank],
+        ["Core Loadout", sharedPortfolioContent.profile.techniques],
+        ["Play Time", sharedPortfolioContent.profile.experience],
+        ["Current Campaign", sharedPortfolioContent.profile.currentArc],
         ["Side Quests", sharedPortfolioContent.profile.sideQuests],
       ],
-      blurb: sharedPortfolioContent.aboutBlurb,
+      blurb:
+        "Nakshatra builds like a systems player, not a button masher. The focus is on practical engineering, strong mechanics, and dependable loops: enterprise workflows, developer tooling, and scalable products that keep performing long after the first release.",
     },
     skills: {
-      title: "Loadout Grid",
-      kicker: "Power Levels",
+      title: "Moves List",
+      kicker: "Power Meter",
       groups: sharedPortfolioContent.skills.map((group, index) => ({
         ...group,
-        title: index === 0 ? "System Weaponry" : "Main Skill Tree",
+        title: index === 0 ? "Backend Inventory" : "Main Skill Tree",
       })),
     },
     projects: {
       title: "Mission Queue",
       kicker: "Recent Runs",
-      items: sharedPortfolioContent.projects,
+      items: [
+        {
+          rank: "S",
+          title: "UNLOOP",
+          desc: "A focus-control run built to counter endless short-form scroll loops across platforms like YouTube Shorts and Instagram Reels. Handles live event detection, navigation tracking, unstable page flows, and real-time behavior control like a system tuned for boss fights.",
+          tags: ["Scroll Control", "Realtime Logic", "Automation"],
+        },
+        {
+          rank: "A",
+          title: "CLISKY",
+          desc: "A command-line sidekick that reads the environment, adapts to the current machine, and generates context-aware commands with a modular architecture. Designed like a utility belt item for faster terminal gameplay.",
+          tags: ["AI CLI", "Python", "System Aware"],
+        },
+        {
+          rank: "A",
+          title: "Gitroaster",
+          desc: "A live web build that scans GitHub profiles, reads repo activity, and turns the data into structured, context-aware roasts. Equal parts analytics engine, API pipeline, and chaotic bonus level.",
+          tags: ["GitHub API", "Data Parsing", "Generative AI"],
+        },
+      ],
     },
     contact: {
-      kicker: "Open Match Request",
-      title: "Connect to Lobby",
-      placeholders: sharedPortfolioContent.contactPlaceholders,
+      kicker: "Multiplayer Lobby",
+      title: "Press Start to Connect",
+      placeholders: {
+        name: "PLAYER TAG",
+        email: "EMAIL ID",
+        brief:
+          "QUEST, BUILD, OR CO-OP IDEA",
+      },
       submitLabel: "Send Invite",
-      loadingLabel: "Connecting...",
-      subject: "New portfolio message for Nakshatra-kun",
+      loadingLabel: "Joining Lobby...",
+      subject: "New Gameverse message for Nakshatra",
       status: {
         pending: "Matchmaking",
-        success: "Invite Sent",
-        error: "Server Timeout",
+        success: "Party Joined",
+        error: "Connection Lost",
       },
     },
     controls: {
-      switchTheme: "Worlds",
-      helpTitle: "`WASD` Move • `E` Action",
-      helpText: "Hold `S` for crouch mode",
-      loadingText: "Booting Gameverse",
+      switchTheme: "World Select",
+      helpTitle: "`WASD` Move • `E` Interact",
+      helpText: "Hold `S` to crouch like a platformer pro",
+      loadingText: "Loading Gameverse",
     },
   },
 };

@@ -91,6 +91,7 @@ export const narutoTheme = {
       emblem: "/assets/themes/naruto/ui/kunai.png",
       focusEmblem: "/assets/themes/naruto/ui/kunai-focus.png",
       loader: "/assets/themes/naruto/ui/loader.gif",
+      particleSprite: "/assets/themes/naruto/ui/fire.png",
     },
     character: {
       idle: "/assets/themes/naruto/character/idle.gif",
@@ -166,7 +167,7 @@ export const narutoTheme = {
       },
     },
     controls: {
-      switchTheme: "Themes",
+      switchTheme: "Worlds",
       helpTitle: "`WASD` Move • `E` Attack",
       helpText: "Hold `S` to crouch or crouch-walk",
       loadingText: "Entering Naruto",
