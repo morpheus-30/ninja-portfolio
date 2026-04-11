@@ -943,6 +943,8 @@ function ThemeLoadingScreen({ theme }) {
   const { colors: C, fonts: F } = theme.design;
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
+  const loaderFrameWidth = isMobile ? "min(78vw, 280px)" : "min(44vw, 220px)";
+  const loaderFrameHeight = isMobile ? "min(30vh, 220px)" : "220px";
 
   return (
     <div
@@ -973,27 +975,39 @@ function ThemeLoadingScreen({ theme }) {
           zIndex: 1,
           display: "grid",
           justifyItems: "center",
-          gap: "1rem",
-          padding: "1.5rem",
+          gap: isMobile ? "0.85rem" : "1rem",
+          padding: isMobile ? "1.1rem" : "1.5rem",
           textAlign: "center",
           isolation: "isolate",
+          width: "100%",
         }}
       >
         {theme.assets.ui.loader && (
-          <img
-            src={theme.assets.ui.loader}
-            alt={`${theme.label} loading`}
+          <div
             style={{
-              width: isMobile ? "min(72vw, 260px)" : "min(44vw, 220px)",
-              maxWidth: isMobile ? "260px" : "220px",
-              minWidth: isMobile ? "180px" : "120px",
-              height: "auto",
-              display: "block",
-              opacity: 1,
-              filter:
-                "contrast(1.04) brightness(1.02) drop-shadow(0 14px 28px rgba(0,0,0,0.45))",
+              width: loaderFrameWidth,
+              height: loaderFrameHeight,
+              display: "grid",
+              placeItems: "center",
             }}
-          />
+          >
+            <img
+              src={theme.assets.ui.loader}
+              alt={`${theme.label} loading`}
+              style={{
+                width: "100%",
+                height: "100%",
+                maxWidth: loaderFrameWidth,
+                maxHeight: loaderFrameHeight,
+                minWidth: isMobile ? "140px" : "120px",
+                objectFit: "contain",
+                display: "block",
+                opacity: 1,
+                filter:
+                  "contrast(1.04) brightness(1.02) drop-shadow(0 14px 28px rgba(0,0,0,0.45))",
+              }}
+            />
+          </div>
         )}
         <div
           style={{
