@@ -1,6 +1,7 @@
 import { narutoTheme } from "./naruto";
+import { popTheme } from "./pop";
 
-export const THEMES = [narutoTheme];
+export const THEMES = [narutoTheme, popTheme];
 
 export const DEFAULT_THEME_ID = narutoTheme.id;
 
