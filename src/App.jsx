@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { Analytics } from "@vercel/analytics/react";
 import ThemeSelector from "./components/ThemeSelector";
 import { ThemeProvider, useThemeTokens } from "./theme-context";
 import { THEMES, getThemeById } from "./themes";
@@ -2543,12 +2544,15 @@ export default function App() {
 
   if (!activeTheme) {
     return (
-      <ThemeSelector
-        themes={THEMES}
-        onSelect={handleThemeSelect}
-        isEnteringTheme={isEnteringTheme}
-        pendingThemeId={pendingThemeId}
-      />
+      <>
+        <ThemeSelector
+          themes={THEMES}
+          onSelect={handleThemeSelect}
+          isEnteringTheme={isEnteringTheme}
+          pendingThemeId={pendingThemeId}
+        />
+        <Analytics />
+      </>
     );
   }
 
@@ -2558,6 +2562,7 @@ export default function App() {
         activeTheme={activeTheme}
         onSwitchTheme={handleSwitchTheme}
       />
+      <Analytics />
     </ThemeProvider>
   );
 }
