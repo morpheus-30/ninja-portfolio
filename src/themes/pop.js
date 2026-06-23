@@ -128,10 +128,10 @@ export const popTheme = {
       kicker: "Insert Coin",
       title: "Player One Engineer",
       intro:
-        "Software engineer building reliable systems like a long-form campaign: steady mechanics, clean logic, and builds that hold up after launch.",
+        "Associate Software Engineer building reliable systems across enterprise software, automation, AI-powered tools, and developer productivity platforms.",
       paragraphs: [
-        "Currently grinding at Yamaha Motor Solutions India, shipping enterprise-focused systems with an API-first mindset, practical architecture, and a strong bias toward smooth execution.",
-        "Main loadout includes Python, Flutter, SAP, FastAPI, JavaScript, Go, and C++, with a focus on creating tools and workflows that feel responsive, scalable, and fun to use.",
+        "Currently building enterprise applications and internal systems at Yamaha Motor Solutions India, focusing on maintainability, scalability, API-first design, and reliable execution.",
+        "Primary loadout includes Python, Flutter, SAP ABAP, FastAPI, JavaScript, and C++, with growing experience in Go and a strong interest in backend engineering, automation, and developer tooling.",
       ],
       ctas: [
         ["Start Missions", 3],
@@ -153,14 +153,14 @@ export const popTheme = {
         ["Side Quests", sharedPortfolioContent.profile.sideQuests],
       ],
       blurb:
-        "Nakshatra builds like a systems player, not a button masher. The focus is on practical engineering, strong mechanics, and dependable loops: enterprise workflows, developer tooling, and scalable products that keep performing long after the first release.",
+        "Nakshatra approaches software engineering like a systems designer rather than a feature collector. His focus is on building reliable enterprise applications, developer tools, automation platforms, and AI-powered products that solve practical problems and continue delivering value long after launch.",
     },
     skills: {
       title: "Moves List",
       kicker: "Power Meter",
       groups: sharedPortfolioContent.skills.map((group, index) => ({
         ...group,
-        title: index === 0 ? "Backend Inventory" : "Main Skill Tree",
+        title: index === 0 ? "Enterprise Tech Tree" : "Programming Arsenal",
       })),
     },
     projects: {
@@ -170,20 +170,23 @@ export const popTheme = {
         {
           rank: "S",
           title: "UNLOOP",
-          desc: "A focus-control run built to counter endless short-form scroll loops across platforms like YouTube Shorts and Instagram Reels. Handles live event detection, navigation tracking, unstable page flows, and real-time behavior control like a system tuned for boss fights.",
+          desc: "A productivity-focused platform designed to reduce short-form content consumption across YouTube Shorts, Instagram Reels, and similar feeds. Features real-time activity tracking, navigation monitoring, browser event detection, and behavioral control mechanisms.",
           tags: ["Scroll Control", "Realtime Logic", "Automation"],
+          link: "https://unloop.iamnaksh.tech",
         },
         {
           rank: "A",
           title: "CLISKY",
-          desc: "A command-line sidekick that reads the environment, adapts to the current machine, and generates context-aware commands with a modular architecture. Designed like a utility belt item for faster terminal gameplay.",
+          desc: "An AI-powered command-line assistant that detects the user's environment and generates contextual commands. Built with a modular architecture supporting Linux distribution awareness, configuration management, and AI-assisted workflows.",
           tags: ["AI CLI", "Python", "System Aware"],
+          link: "https://pypi.org/project/clisky/",
         },
         {
           rank: "A",
           title: "Gitroaster",
-          desc: "A live web build that scans GitHub profiles, reads repo activity, and turns the data into structured, context-aware roasts. Equal parts analytics engine, API pipeline, and chaotic bonus level.",
+          desc: "A deployed web application that analyzes GitHub profiles using repository metadata and activity patterns to generate context-aware AI-powered insights, evaluations, and humorous roasts.",
           tags: ["GitHub API", "Data Parsing", "Generative AI"],
+          link: "http://gitroaster.streamlit.app/",
         },
       ],
     },
@@ -194,7 +197,7 @@ export const popTheme = {
         name: "PLAYER TAG",
         email: "EMAIL ID",
         brief:
-          "QUEST, BUILD, OR CO-OP IDEA",
+          "PRODUCT, SYSTEM, OR COLLABORATION IDEA",
       },
       submitLabel: "Send Invite",
       loadingLabel: "Joining Lobby...",
@@ -209,7 +212,7 @@ export const popTheme = {
       switchTheme: "World Select",
       helpTitle: "`WASD` Move • `E` Interact",
       helpText: "Hold `S` to crouch like a platformer pro",
-      loadingText: "Loading Gameverse",
+      loadingText: "Loading Developer Profile",
     },
   },
 };

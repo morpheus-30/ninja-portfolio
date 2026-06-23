@@ -256,40 +256,40 @@ function NarutoWalker({ action, direction, isMobile }) {
         ? 92
         : 110
       : (action === "attack2" || action === "attack3") && theme.id === "pop"
-      ? isMobile
-        ? 108
-        : 170
-      : action === "attack1" && theme.id === "pop"
-      ? isMobile
-        ? 108
-        : 140
-      : action === "jump" && theme.id === "pop"
-      ? isMobile
-        ? 114
-        : 240
-      : theme.id === "pop"
-      ? isMobile
-        ? 108
-        : 200
-      : // Jump GIF needs the tallest frame so the full arc stays visible.
-      action === "jump"
-      ? isMobile
-        ? 114
-        : 200
-      : // These two crouch attack GIFs are smaller in source, so we upscale them.
-      action === "crouchAttack2" || action === "crouchAttack1"
-      ? isMobile
-        ? 112
-        : 220
-      : // Third crouch attack gets its own slightly smaller tuning.
-      action === "crouchAttack3"
-      ? isMobile
-        ? 108
-        : 180
-      : // Default size for idle/run/crouch/most other actions.
-      isMobile
-      ? 102
-      : 146;
+        ? isMobile
+          ? 108
+          : 170
+        : action === "attack1" && theme.id === "pop"
+          ? isMobile
+            ? 108
+            : 140
+          : action === "jump" && theme.id === "pop"
+            ? isMobile
+              ? 114
+              : 240
+            : theme.id === "pop"
+              ? isMobile
+                ? 108
+                : 200
+              : // Jump GIF needs the tallest frame so the full arc stays visible.
+              action === "jump"
+                ? isMobile
+                  ? 114
+                  : 200
+                : // These two crouch attack GIFs are smaller in source, so we upscale them.
+                action === "crouchAttack2" || action === "crouchAttack1"
+                  ? isMobile
+                    ? 112
+                    : 220
+                  : // Third crouch attack gets its own slightly smaller tuning.
+                  action === "crouchAttack3"
+                    ? isMobile
+                      ? 108
+                      : 180
+                    : // Default size for idle/run/crouch/most other actions.
+                    isMobile
+                      ? 102
+                      : 146;
 
   // Vertical offset fixes GIFs whose feet sit too high in the frame.
   // This is the place to lower or raise a Gameverse GIF if it floats above the ground.
@@ -299,10 +299,10 @@ function NarutoWalker({ action, direction, isMobile }) {
         ? -2
         : 20
       : action === "crouchAttack2"
-      ? isMobile
-        ? -6
-        : -20
-      : 0;
+        ? isMobile
+          ? -6
+          : -20
+        : 0;
 
   return (
     <div
@@ -346,7 +346,14 @@ function NarutoWalker({ action, direction, isMobile }) {
   );
 }
 
-function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
+function SectionShell({
+  title,
+  kicker,
+  children,
+  isMobile,
+  isTightViewport,
+  titleStyle,
+}) {
   const { theme, C, F, UI } = useThemeTokens();
   const isGameverse = theme.id === "pop";
   const mobileGameverseShellPadding = "0.72rem 0.68rem 0.82rem";
@@ -384,34 +391,46 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
         width: isMobile
           ? "calc(100vw - 1.5rem)"
           : "min(1120px, calc(100vw - 2.5rem))",
-        minHeight: isMobile ? "calc(100vh - 7.5rem)" : "min(70vh, 760px)",
-        maxHeight: isMobile ? "calc(100vh - 7.5rem)" : "none",
+        minHeight: isMobile
+          ? "calc(100vh - 7.5rem)"
+          : isTightViewport
+            ? "auto"
+            : "min(70vh, 760px)",
+        maxHeight: isMobile
+          ? "calc(100vh - 7.5rem)"
+          : isTightViewport
+            ? "none"
+            : "none",
         padding: isMobile
           ? isGameverse
             ? mobileGameverseShellPadding
             : "1rem"
-          : "clamp(1.6rem, 2vw, 2.2rem)",
+          : isGameverse
+            ? "clamp(2.25rem, 3vw, 3.15rem)"
+            : "clamp(1.6rem, 2vw, 2.2rem)",
         border: UI.sectionBorder,
         borderRadius: isGameverse
           ? "0"
           : isMobile
-          ? "14px 24px 14px 24px"
-          : "18px 42px 18px 42px",
+            ? "14px 24px 14px 24px"
+            : "18px 42px 18px 42px",
         background: UI.sectionBackground,
         boxShadow: UI.sectionShadow,
         display: "grid",
-        alignItems: isMobile && isGameverse ? "stretch" : "center",
+        alignItems: (isMobile || isTightViewport) && isGameverse
+          ? "stretch"
+          : "center",
         position: "relative",
         overflowX: "hidden",
-        overflowY: isMobile ? "auto" : "hidden",
-        WebkitOverflowScrolling: isMobile ? "touch" : "auto",
-        overscrollBehavior: isMobile ? "contain" : "auto",
-        touchAction: isMobile ? "pan-y" : "auto",
+        overflowY: isMobile || isTightViewport ? "auto" : "hidden",
+        WebkitOverflowScrolling: isMobile || isTightViewport ? "touch" : "auto",
+        overscrollBehavior: isMobile || isTightViewport ? "contain" : "auto",
+        touchAction: isMobile || isTightViewport ? "pan-y" : "auto",
         clipPath: isGameverse
           ? gameverseClip
           : isMobile
-          ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
-          : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
+            ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
+            : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
       }}
     >
       <div
@@ -556,22 +575,36 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
         style={{
           position: "relative",
           zIndex: 1,
-          minHeight: isMobile && isGameverse ? "100%" : "auto",
+          minHeight: (isMobile || isTightViewport) && isGameverse
+            ? "100%"
+            : "auto",
           overflow: "visible",
           paddingRight: isMobile
             ? isGameverse
               ? mobileGameverseContentPaddingX
               : "0.2rem"
-            : 0,
+            : isGameverse
+              ? "0.9rem"
+              : 0,
           paddingTop: isMobile
             ? isGameverse
               ? mobileGameverseContentPaddingTop
               : "0.15rem"
-            : "0.2rem",
+            : isGameverse
+              ? "0.8rem"
+              : "0.2rem",
           paddingBottom:
-            isMobile && isGameverse ? mobileGameverseContentPaddingBottom : 0,
+            isGameverse
+              ? isMobile
+                ? mobileGameverseContentPaddingBottom
+                : "0.9rem"
+              : 0,
           paddingLeft:
-            isMobile && isGameverse ? mobileGameverseContentPaddingX : 0,
+            isGameverse
+              ? isMobile
+                ? mobileGameverseContentPaddingX
+                : "0.9rem"
+              : 0,
         }}
       >
         {isGameverse && (
@@ -609,7 +642,7 @@ function SectionShell({ title, kicker, children, isMobile, titleStyle }) {
             style={{
               position: "absolute",
               inset: 0,
-              clipPath: gameverseClip,
+              clipPath: "none",
               backgroundImage: `url(${theme.assets.ui.stoneTile})`,
               backgroundRepeat: "repeat",
               backgroundSize: isMobile ? "280px 280px" : "340px 340px",
@@ -736,7 +769,7 @@ function StatCard({ label, value }) {
   );
 }
 
-function SkillBar({ label, value, color }) {
+function SkillBar({ label, value, color, compact = false }) {
   const { theme, C, F } = useThemeTokens();
   const isGameverse = theme.id === "pop";
   const isMobile =
@@ -754,11 +787,13 @@ function SkillBar({ label, value, color }) {
   return (
     <div
       style={{
-        marginBottom: isGameverse ? "0.65rem" : "1rem",
+        marginBottom: isGameverse ? (compact ? "0.38rem" : "0.65rem") : "1rem",
         padding: isGameverse
           ? isMobile
             ? "0.6rem 0.68rem"
-            : "0.7rem 0.82rem"
+            : compact
+              ? "0.42rem 0.58rem"
+              : "0.7rem 0.82rem"
           : 0,
         borderRadius: isGameverse ? "12px" : 0,
         border: isGameverse ? "1px solid rgba(232, 206, 166, 0.24)" : "none",
@@ -774,7 +809,7 @@ function SkillBar({ label, value, color }) {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginBottom: "0.35rem",
+          marginBottom: compact ? "0.2rem" : "0.35rem",
           alignItems: "center",
           gap: "0.75rem",
         }}
@@ -784,7 +819,7 @@ function SkillBar({ label, value, color }) {
             color: isGameverse ? "#f6e7c3" : C.text,
             fontFamily: isGameverse ? F.body : undefined,
             letterSpacing: isGameverse ? "0.04em" : undefined,
-            fontSize: isGameverse ? "0.95rem" : undefined,
+            fontSize: isGameverse ? (compact ? "0.82rem" : "0.95rem") : undefined,
           }}
         >
           {label}
@@ -793,7 +828,7 @@ function SkillBar({ label, value, color }) {
           style={{
             color: isGameverse ? "#f3d18a" : C.gold,
             fontFamily: isGameverse ? F.body : undefined,
-            fontSize: isGameverse ? "0.92rem" : undefined,
+            fontSize: isGameverse ? (compact ? "0.8rem" : "0.92rem") : undefined,
             fontWeight: isGameverse ? 700 : undefined,
             letterSpacing: isGameverse ? "0.04em" : undefined,
             flex: "0 0 auto",
@@ -809,7 +844,7 @@ function SkillBar({ label, value, color }) {
             display: "flex",
             alignItems: "center",
             gap: "0.26rem",
-            minHeight: "22px",
+            minHeight: compact ? "17px" : "22px",
           }}
         >
           {heartSprites.map((sprite, index) => (
@@ -819,8 +854,8 @@ function SkillBar({ label, value, color }) {
               alt=""
               aria-hidden="true"
               style={{
-                width: "20px",
-                height: "20px",
+                width: compact ? "16px" : "20px",
+                height: compact ? "16px" : "20px",
                 objectFit: "contain",
                 imageRendering: "pixelated",
                 filter: `drop-shadow(0 0 6px ${color}33)`,
@@ -853,7 +888,7 @@ function SkillBar({ label, value, color }) {
   );
 }
 
-function MissionCard({ rank, title, desc, tags }) {
+function MissionCard({ rank, title, desc, tags, link }) {
   const { theme, C, F, UI } = useThemeTokens();
   const isGameverse = theme.id === "pop";
   const isMobile =
@@ -892,14 +927,46 @@ function MissionCard({ rank, title, desc, tags }) {
       </div>
       <h3
         style={{
-          color: C.text,
           fontSize: isGameverse ? "1.8rem" : "1.2rem",
           marginBottom: "0.42rem",
           fontFamily: isGameverse ? F.display : undefined,
           letterSpacing: isGameverse ? "0.03em" : undefined,
         }}
       >
-        {title}
+        {link ? (
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className={
+              isGameverse
+                ? "gameverse-project-title-link"
+                : "project-title-link"
+            }ip
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.42rem",
+              color: C.text,
+              textDecoration: "none",
+              transition: "color 140ms ease, text-shadow 140ms ease",
+            }}
+          >
+            <span>{title}</span>
+            <span
+              aria-hidden="true"
+              style={{
+                color: isGameverse ? C.gold : C.sand,
+                fontSize: isGameverse ? "0.42em" : "0.4em",
+                lineHeight: 1,
+              }}
+            >
+            </span>
+              ↗
+          </a>
+        ) : (
+          <span style={{ color: C.text }}>{title}</span>
+        )}
       </h3>
       <p
         style={{
@@ -1064,65 +1131,70 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
   const contactFormRef = useRef(null);
   const pressedKeysRef = useRef(new Set());
   const isMobile = viewportWidth < 768;
-  const isCompactHero = !isMobile && viewportWidth < 1180;
+  const isTightViewport = !isMobile && viewportHeight < 820;
+  const isCompactHero =
+    !isMobile && isGameverse && viewportWidth < 900;
+  const isTightGameverseHero = isGameverse && isTightViewport && !isCompactHero;
   const gameverseCastleSilhouettes = useMemo(
     () =>
       isGameverse
         ? [
-            {
-              left: "-2%",
-              width: isMobile ? "24%" : "14%",
-              height: isMobile ? "76px" : "116px",
-              bottom: isMobile ? "18px" : "24px",
-              opacity: 0.22,
-              blur: "1px",
-              skew: "-5deg",
-            },
-            {
-              left: isMobile ? "18%" : "16%",
-              width: isMobile ? "18%" : "11%",
-              height: isMobile ? "60px" : "92px",
-              bottom: isMobile ? "28px" : "32px",
-              opacity: 0.16,
-              blur: "1px",
-              skew: "4deg",
-            },
-            {
-              left: isMobile ? "38%" : "37%",
-              width: isMobile ? "22%" : "13%",
-              height: isMobile ? "84px" : "124px",
-              bottom: isMobile ? "16px" : "20px",
-              opacity: 0.2,
-              blur: "1px",
-              skew: "-3deg",
-            },
-            {
-              left: isMobile ? "60%" : "58%",
-              width: isMobile ? "18%" : "10%",
-              height: isMobile ? "64px" : "96px",
-              bottom: isMobile ? "24px" : "30px",
-              opacity: 0.17,
-              blur: "1px",
-              skew: "5deg",
-            },
-            {
-              left: isMobile ? "74%" : "78%",
-              width: isMobile ? "22%" : "12%",
-              height: isMobile ? "72px" : "108px",
-              bottom: isMobile ? "18px" : "24px",
-              opacity: 0.19,
-              blur: "1px",
-              skew: "-4deg",
-            },
-          ]
+          {
+            left: "-2%",
+            width: isMobile ? "24%" : "14%",
+            height: isMobile ? "76px" : "116px",
+            bottom: isMobile ? "18px" : "24px",
+            opacity: 0.22,
+            blur: "1px",
+            skew: "-5deg",
+          },
+          {
+            left: isMobile ? "18%" : "16%",
+            width: isMobile ? "18%" : "11%",
+            height: isMobile ? "60px" : "92px",
+            bottom: isMobile ? "28px" : "32px",
+            opacity: 0.16,
+            blur: "1px",
+            skew: "4deg",
+          },
+          {
+            left: isMobile ? "38%" : "37%",
+            width: isMobile ? "22%" : "13%",
+            height: isMobile ? "84px" : "124px",
+            bottom: isMobile ? "16px" : "20px",
+            opacity: 0.2,
+            blur: "1px",
+            skew: "-3deg",
+          },
+          {
+            left: isMobile ? "60%" : "58%",
+            width: isMobile ? "18%" : "10%",
+            height: isMobile ? "64px" : "96px",
+            bottom: isMobile ? "24px" : "30px",
+            opacity: 0.17,
+            blur: "1px",
+            skew: "5deg",
+          },
+          {
+            left: isMobile ? "74%" : "78%",
+            width: isMobile ? "22%" : "12%",
+            height: isMobile ? "72px" : "108px",
+            bottom: isMobile ? "18px" : "24px",
+            opacity: 0.19,
+            blur: "1px",
+            skew: "-4deg",
+          },
+        ]
         : [],
     [isGameverse, isMobile]
   );
   const heroPortraitMaxHeight = isMobile
     ? Math.min(Math.max(viewportHeight * 0.28, 180), 260)
-    : isCompactHero
-    ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
-    : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
+    : isTightGameverseHero
+      ? Math.min(Math.max(viewportHeight * 0.24, 160), 220)
+      : isCompactHero
+        ? Math.min(Math.max(viewportHeight * 0.34, 220), 300)
+        : Math.min(Math.max(viewportHeight * 0.42, 240), 360);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsThemeMounted(true), 40);
@@ -1331,10 +1403,10 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
       } else if (key === "e") {
         const attackAction = pressedKeysRef.current.has("s")
           ? pickRandomAction([
-              "crouchAttack1",
-              "crouchAttack2",
-              "crouchAttack3",
-            ])
+            "crouchAttack1",
+            "crouchAttack2",
+            "crouchAttack3",
+          ])
           : pickRandomAction(["attack1", "attack2", "attack3"]);
 
         setCharacterAction(attackAction);
@@ -1590,6 +1662,17 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             0 0 0.5px rgba(111, 247, 255, 0.95),
             0 0 8px rgba(111, 247, 255, 0.42);
           animation: gvFlicker 220ms steps(3, end) 1;
+        }
+        .gameverse-project-title-link:hover {
+          color: #6ff7ff !important;
+          text-shadow:
+            0.8px 0 0 rgba(255,70,85,0.52),
+            -0.8px 0 0 rgba(111,255,233,0.45),
+            0 0 10px rgba(111,247,255,0.36);
+          animation: gvFlicker 220ms steps(3, end) 1;
+        }
+        .project-title-link:hover {
+          color: ${C.gold} !important;
         }
         .gameverse-nav-dot {
           display: none;
@@ -1850,8 +1933,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   ? "0.98rem"
                   : "1.12rem"
                 : isMobile
-                ? "0.82rem"
-                : "1rem",
+                  ? "0.82rem"
+                  : "1rem",
               flex: "0 0 auto",
             }}
           >
@@ -1863,28 +1946,26 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               onClick={() => triggerTransition(idx)}
               className={
                 isGameverse
-                  ? `gameverse-nav-button ${
-                      idx === sectionIdx ? "is-active" : ""
-                    }`
+                  ? `gameverse-nav-button ${idx === sectionIdx ? "is-active" : ""
+                  }`
                   : undefined
               }
               style={{
                 borderRadius: isGameverse ? "0" : "999px",
-                border: `1px solid ${
-                  idx === sectionIdx ? "rgba(239,197,108,0.55)" : "transparent"
-                }`,
+                border: `1px solid ${idx === sectionIdx ? "rgba(239,197,108,0.55)" : "transparent"
+                  }`,
                 background: isGameverse
                   ? "transparent"
                   : idx === sectionIdx
-                  ? "rgba(239,197,108,0.12)"
-                  : "transparent",
+                    ? "rgba(239,197,108,0.12)"
+                    : "transparent",
                 color: isGameverse
                   ? idx === sectionIdx
                     ? "#f4d98f"
                     : "#d6c49d"
                   : idx === sectionIdx
-                  ? C.text
-                  : C.muted,
+                    ? C.text
+                    : C.muted,
                 padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
                 textTransform: "uppercase",
                 letterSpacing: isGameverse ? "0.14em" : "0.12em",
@@ -1898,8 +1979,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     ? "0.98rem"
                     : "1.12rem"
                   : isMobile
-                  ? "0.82rem"
-                  : "1rem",
+                    ? "0.82rem"
+                    : "1rem",
               }}
             >
               <span className={isGameverse ? "gameverse-nav-label" : undefined}>
@@ -1920,16 +2001,25 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           width: "100%",
           height: "100%",
           display: "grid",
-          placeItems: isMobile ? "start center" : "center",
+          placeItems: isMobile || (isGameverse && isTightViewport)
+            ? "start center"
+            : "center",
           padding: isMobile
             ? isGameverse
               ? "5.85rem 0.5rem 1.15rem"
               : "5.85rem 0.75rem 1.25rem"
-            : "5.8rem 0.9rem 8.8rem",
+            : isGameverse && isTightViewport
+              ? "6.45rem 0.9rem 1.2rem"
+              : "5.8rem 0.9rem 8.8rem",
           opacity: visible ? 1 : 0,
           transform: visible ? "scale(1)" : "scale(0.985)",
           transition: "opacity 320ms ease, transform 320ms ease",
-          overflow: "hidden",
+          overflowY: isMobile || (isGameverse && isTightViewport)
+            ? "auto"
+            : "hidden",
+          overflowX: "hidden",
+          WebkitOverflowScrolling:
+            isMobile || (isGameverse && isTightViewport) ? "touch" : "auto",
         }}
       >
         {displayIdx === 0 && (
@@ -1937,12 +2027,13 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             title={HOME_CONTENT.title}
             kicker={HOME_CONTENT.kicker}
             isMobile={isMobile}
+            isTightViewport={isGameverse && isTightViewport}
             titleStyle={{
               fontSize: isMobile
                 ? "clamp(1.9rem, 10vw, 2.8rem)"
                 : isCompactHero
-                ? "clamp(2rem, 3.8vw, 3.4rem)"
-                : "clamp(2.2rem, 4.5vw, 4rem)",
+                  ? "clamp(2rem, 3.8vw, 3.4rem)"
+                  : "clamp(2.2rem, 4.5vw, 4rem)",
               lineHeight: isMobile ? 1 : 0.98,
             }}
           >
@@ -1952,8 +2043,16 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 gridTemplateColumns:
                   isMobile || isCompactHero
                     ? "minmax(0, 1fr)"
-                    : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
-                gap: isMobile ? "1rem" : "1.6rem",
+                    : isTightGameverseHero
+                      ? "minmax(0, 1.35fr) minmax(160px, 0.45fr)"
+                      : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
+                gap: isMobile
+                  ? "1rem"
+                  : isTightGameverseHero
+                    ? "0.9rem"
+                    : isCompactHero
+                      ? "1.25rem"
+                      : "1.6rem",
                 alignItems: isMobile || isCompactHero ? "start" : "center",
               }}
             >
@@ -1962,8 +2061,10 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   maxWidth: isCompactHero ? "100%" : "720px",
                   padding: isGameverse
                     ? isMobile
-                      ? "0.84rem 0.9rem"
-                      : "1rem 1.05rem"
+                      ? "1.15rem 1.2rem 1.25rem"
+                      : isTightGameverseHero
+                        ? "1.25rem 1.45rem 1.35rem"
+                        : "1.8rem 2rem 1.9rem"
                     : 0,
                   borderRadius: isGameverse ? "12px" : 0,
                   border: isGameverse
@@ -1981,8 +2082,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   style={{
                     fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
                     color: C.sand,
-                    marginBottom: "0.8rem",
-                    lineHeight: 1.5,
+                    marginBottom: isGameverse ? "1.1rem" : "0.8rem",
+                    lineHeight: isTightGameverseHero ? 1.42 : 1.5,
                   }}
                 >
                   {HOME_CONTENT.intro}
@@ -1996,16 +2097,27 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                       maxWidth: "640px",
                       marginBottom:
                         index === HOME_CONTENT.paragraphs.length - 1
-                          ? "1.4rem"
-                          : "1rem",
+                          ? isGameverse
+                            ? "1.65rem"
+                            : "1.4rem"
+                          : isGameverse
+                            ? "1.12rem"
+                            : "1rem",
                       fontSize: isMobile ? "0.96rem" : "1rem",
+                      ...(isTightGameverseHero
+                        ? { fontSize: "0.92rem", lineHeight: 1.62 }
+                        : null),
                     }}
                   >
                     {paragraph}
                   </p>
                 ))}
                 <div
-                  style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap" }}
+                  style={{
+                    display: "flex",
+                    gap: isGameverse ? "0.9rem 1rem" : "0.8rem",
+                    flexWrap: "wrap",
+                  }}
                 >
                   {HOME_CONTENT.ctas.map(([label, idx]) => (
                     <button
@@ -2039,8 +2151,10 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   style={{
                     justifySelf: "center",
                     width: isCompactHero
-                      ? "min(100%, 240px)"
-                      : "min(100%, 290px)",
+                      ? "min(100%, 220px)"
+                      : isTightGameverseHero
+                        ? "min(100%, 190px)"
+                        : "min(100%, 290px)",
                     aspectRatio: "4 / 5",
                     maxHeight: `${heroPortraitMaxHeight}px`,
                     borderRadius: "28px",
@@ -2073,6 +2187,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             title={ABOUT_CONTENT.title}
             kicker={ABOUT_CONTENT.kicker}
             isMobile={isMobile}
+            isTightViewport={isGameverse && isTightViewport}
           >
             <div
               style={{
@@ -2107,6 +2222,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             title={SKILLS_CONTENT.title}
             kicker={SKILLS_CONTENT.kicker}
             isMobile={isMobile}
+            isTightViewport={isGameverse && isTightViewport}
           >
             <div
               style={{
@@ -2114,7 +2230,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 gridTemplateColumns: isMobile
                   ? "1fr"
                   : "repeat(2, minmax(0, 1fr))",
-                gap: "0.95rem",
+                gap: isGameverse && isTightViewport ? "0.58rem" : "0.95rem",
                 width: "100%",
                 alignItems: "start",
               }}
@@ -2126,7 +2242,9 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     padding: isGameverse
                       ? isMobile
                         ? "0.86rem 0.9rem"
-                        : "0.9rem"
+                        : isTightViewport
+                          ? "0.58rem 0.64rem"
+                          : "0.9rem"
                       : 0,
                     borderRadius: isGameverse ? "14px" : 0,
                     border: isGameverse
@@ -2143,10 +2261,15 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                   <p
                     style={{
                       color: C.gold,
-                      marginBottom: "0.78rem",
+                      marginBottom:
+                        isGameverse && isTightViewport ? "0.42rem" : "0.78rem",
                       textTransform: "uppercase",
                       letterSpacing: "0.14em",
-                      fontSize: isGameverse ? "0.84rem" : undefined,
+                      fontSize: isGameverse
+                        ? isTightViewport
+                          ? "0.72rem"
+                          : "0.84rem"
+                        : undefined,
                     }}
                   >
                     {group.title}
@@ -2157,6 +2280,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                       label={skill.label}
                       value={skill.value}
                       color={skill.color}
+                      compact={isGameverse && isTightViewport}
                     />
                   ))}
                 </div>
@@ -2170,6 +2294,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             title={PROJECTS_CONTENT.title}
             kicker={PROJECTS_CONTENT.kicker}
             isMobile={isMobile}
+            isTightViewport={isGameverse && isTightViewport}
           >
             <div
               style={{
@@ -2192,6 +2317,7 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             title={CONTACT_CONTENT.title}
             kicker={CONTACT_CONTENT.kicker}
             isMobile={isMobile}
+            isTightViewport={isGameverse && isTightViewport}
           >
             <form
               ref={contactFormRef}
@@ -2322,20 +2448,19 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     borderRadius: isGameverse ? "14px" : "14px 22px 14px 18px",
                     border: isGameverse
                       ? "2px solid rgba(90, 65, 43, 0.95)"
-                      : `1px solid ${
-                          contactState === "success"
-                            ? "rgba(239,197,108,0.4)"
-                            : contactState === "error"
-                            ? "rgba(157,44,18,0.65)"
-                            : "rgba(125,75,28,0.8)"
-                        }`,
+                      : `1px solid ${contactState === "success"
+                        ? "rgba(239,197,108,0.4)"
+                        : contactState === "error"
+                          ? "rgba(157,44,18,0.65)"
+                          : "rgba(125,75,28,0.8)"
+                      }`,
                     background: isGameverse
                       ? "linear-gradient(180deg, rgba(118,82,49,0.92) 0%, rgba(87,57,31,0.95) 100%)"
                       : contactState === "success"
-                      ? UI.contactSuccessBackground
-                      : contactState === "error"
-                      ? UI.contactErrorBackground
-                      : UI.contactPendingBackground,
+                        ? UI.contactSuccessBackground
+                        : contactState === "error"
+                          ? UI.contactErrorBackground
+                          : UI.contactPendingBackground,
                     color: contactState === "error" ? "#ffd7c9" : C.sand,
                     lineHeight: 1.6,
                     boxShadow: isGameverse
@@ -2354,8 +2479,8 @@ function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                     {contactState === "success"
                       ? CONTACT_CONTENT.status.success
                       : contactState === "error"
-                      ? CONTACT_CONTENT.status.error
-                      : CONTACT_CONTENT.status.pending}
+                        ? CONTACT_CONTENT.status.error
+                        : CONTACT_CONTENT.status.pending}
                   </div>
                   <div style={{ fontSize: "0.92rem" }}>{contactMessage}</div>
                 </div>
