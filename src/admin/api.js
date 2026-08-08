@@ -27,3 +27,18 @@ export async function discardDraft() {
   if (!res.ok) throw new Error(`Failed to discard draft: ${res.status}`);
   return res.json();
 }
+
+export async function publishDraft() {
+  const res = await fetch("/api/admin/publish", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || `Publish failed: ${res.status}`);
+  }
+
+  return data;
+}

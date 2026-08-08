@@ -2,9 +2,13 @@ import * as defaultData from "../data/portfolio";
 
 /**
  * Build the Gameverse (pop) theme using the provided portfolio data.
+ *
+ * All portfolio content (profile, bio, skills, projects) comes from the shared
+ * data layer. This theme only controls presentation: labels, kickers, styling,
+ * and visual configuration.
  */
 export function buildPopTheme(data = defaultData) {
-  const { profile, skills } = data;
+  const { profile, bio, skills, projects } = data;
 
   return {
     id: "pop",
@@ -131,14 +135,13 @@ export function buildPopTheme(data = defaultData) {
     },
     content: {
       home: {
+        // Theme-specific labels
         kicker: "Insert Coin",
-        title: "Player One Engineer",
-        intro:
-          "Associate Software Engineer building reliable systems across enterprise software, automation, AI-powered tools, and developer productivity platforms.",
-        paragraphs: [
-          "Currently building enterprise applications and internal systems at Yamaha Motor Solutions India, focusing on maintainability, scalability, API-first design, and reliable execution.",
-          "Primary loadout includes Python, Flutter, SAP ABAP, FastAPI, JavaScript, and C++, with growing experience in Go and a strong interest in backend engineering, automation, and developer tooling.",
-        ],
+        title: bio.headline,
+        // Shared portfolio content
+        intro: bio.intro,
+        paragraphs: bio.paragraphs,
+        // Theme-specific CTAs
         ctas: [
           ["Start Missions", 3],
           ["View CHARACTER SELECT", 1],
@@ -146,8 +149,10 @@ export function buildPopTheme(data = defaultData) {
         ],
       },
       about: {
+        // Theme-specific labels
         title: "CHARACTER SELECT",
         kicker: "Player Stats",
+        // Shared portfolio content (with themed stat labels)
         stats: [
           ["Player Tag", profile.name],
           ["Guild", profile.company],
@@ -158,45 +163,34 @@ export function buildPopTheme(data = defaultData) {
           ["Current Campaign", profile.focus],
           ["Side Quests", profile.hobbies],
         ],
-        blurb:
-          "Nakshatra approaches software engineering like a systems designer rather than a feature collector. His focus is on building reliable enterprise applications, developer tools, automation platforms, and AI-powered products that solve practical problems and continue delivering value long after launch.",
+        // Shared portfolio content
+        blurb: bio.blurb,
       },
       skills: {
+        // Theme-specific labels
         title: "Moves List",
         kicker: "Power Meter",
+        // Shared portfolio content (with themed group titles)
         groups: skills.map((group, index) => ({
           title: index === 0 ? "Enterprise Tech Tree" : "Programming Arsenal",
           skills: group.items,
         })),
       },
       projects: {
+        // Theme-specific labels
         title: "Mission Queue",
         kicker: "Recent Runs",
-        items: [
-          {
-            rank: "S",
-            title: "UNLOOP",
-            desc: "A productivity-focused platform designed to reduce short-form content consumption across YouTube Shorts, Instagram Reels, and similar feeds. Features real-time activity tracking, navigation monitoring, browser event detection, and behavioral control mechanisms.",
-            tags: ["Scroll Control", "Realtime Logic", "Automation"],
-            link: "https://unloop.iamnaksh.tech",
-          },
-          {
-            rank: "A",
-            title: "CLISKY",
-            desc: "An AI-powered command-line assistant that detects the user's environment and generates contextual commands. Built with a modular architecture supporting Linux distribution awareness, configuration management, and AI-assisted workflows.",
-            tags: ["AI CLI", "Python", "System Aware"],
-            link: "https://pypi.org/project/clisky/",
-          },
-          {
-            rank: "A",
-            title: "Gitroaster",
-            desc: "A deployed web application that analyzes GitHub profiles using repository metadata and activity patterns to generate context-aware AI-powered insights, evaluations, and humorous roasts.",
-            tags: ["GitHub API", "Data Parsing", "Generative AI"],
-            link: "http://gitroaster.streamlit.app/",
-          },
-        ],
+        // Shared portfolio content — derived from the canonical projects data
+        items: projects.map((p) => ({
+          rank: p.title === "UNLOOP" ? "S" : "A",
+          title: p.title,
+          desc: p.description,
+          tags: p.tags,
+          link: p.link,
+        })),
       },
       contact: {
+        // Theme-specific labels and presentation
         kicker: "Multiplayer Lobby",
         title: "Press Start to Connect",
         placeholders: {
@@ -206,7 +200,7 @@ export function buildPopTheme(data = defaultData) {
         },
         submitLabel: "Send Invite",
         loadingLabel: "Joining Lobby...",
-        subject: "New Gameverse message for Nakshatra",
+        subject: "New Gameverse message for " + profile.name,
         status: {
           pending: "Matchmaking",
           success: "Party Joined",
