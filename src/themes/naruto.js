@@ -1,4 +1,4 @@
-import { sharedPortfolioContent } from "./content";
+import { profile, bio, skills, projects } from "../data/portfolio";
 
 export const narutoTheme = {
   id: "naruto",
@@ -119,9 +119,9 @@ export const narutoTheme = {
   content: {
     home: {
       kicker: "Leaf Village Tech Division",
-      title: sharedPortfolioContent.home.title,
-      intro: sharedPortfolioContent.home.intro,
-      paragraphs: sharedPortfolioContent.home.paragraphs,
+      title: bio.headline,
+      intro: bio.intro,
+      paragraphs: bio.paragraphs,
       ctas: [
         ["View Missions", 3],
         ["Ninja Profile", 1],
@@ -132,31 +132,45 @@ export const narutoTheme = {
       title: "Ninja Profile",
       kicker: "Character Sheet",
       stats: [
-        ["Name", sharedPortfolioContent.profile.name],
-        ["Alliance", sharedPortfolioContent.profile.alliance],
-        ["Village", sharedPortfolioContent.profile.village],
-        ["Rank", sharedPortfolioContent.profile.rank],
-        ["Primary Techniques", sharedPortfolioContent.profile.techniques],
-        ["Experience", sharedPortfolioContent.profile.experience],
-        ["Current Arc", sharedPortfolioContent.profile.currentArc],
-        ["Side Quests", sharedPortfolioContent.profile.sideQuests],
+        ["Name", profile.name],
+        ["Alliance", profile.company],
+        ["Village", profile.location],
+        ["Rank", profile.title],
+        ["Primary Techniques", profile.primarySkills],
+        ["Experience", profile.experience],
+        ["Current Arc", profile.focus],
+        ["Side Quests", profile.hobbies],
       ],
-      blurb: sharedPortfolioContent.aboutBlurb,
+      blurb: bio.blurb,
     },
     skills: {
       title: "Jutsu Arsenal",
       kicker: "Power Levels",
-      groups: sharedPortfolioContent.skills,
+      groups: skills.map((group) => ({
+        title: group.category,
+        skills: group.items,
+      })),
     },
     projects: {
       title: "Mission Board",
       kicker: "Recent Arcs",
-      items: sharedPortfolioContent.projects,
+      items: projects.map((p) => ({
+        rank: p.title === "UNLOOP" ? "S" : "A",
+        title: p.title,
+        desc: p.description,
+        tags: p.tags,
+        link: p.link,
+      })),
     },
     contact: {
       kicker: "Issue a Mission Scroll",
       title: "Summon the Shinobi",
-      placeholders: sharedPortfolioContent.contactPlaceholders,
+      placeholders: {
+        name: profile.name,
+        email: "your@email.com",
+        brief:
+          "Describe the product, system, opportunity, or project you'd like to discuss.",
+      },
       submitLabel: "Summon Contact",
       loadingLabel: "Summoning...",
       subject: "New portfolio message for Nakshatra-kun",

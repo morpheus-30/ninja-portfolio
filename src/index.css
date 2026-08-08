@@ -11,3 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: #090606;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,4 +1,4 @@
-import { sharedPortfolioContent } from "./content";
+import { profile, skills } from "../data/portfolio";
 
 export const popTheme = {
   id: "pop",
@@ -143,14 +143,14 @@ export const popTheme = {
       title: "CHARACTER SELECT",
       kicker: "Player Stats",
       stats: [
-        ["Player Tag", sharedPortfolioContent.profile.name],
-        ["Guild", sharedPortfolioContent.profile.alliance],
-        ["Spawn Point", sharedPortfolioContent.profile.village],
-        ["Class", sharedPortfolioContent.profile.rank],
-        ["Core Loadout", sharedPortfolioContent.profile.techniques],
-        ["Play Time", sharedPortfolioContent.profile.experience],
-        ["Current Campaign", sharedPortfolioContent.profile.currentArc],
-        ["Side Quests", sharedPortfolioContent.profile.sideQuests],
+        ["Player Tag", profile.name],
+        ["Guild", profile.company],
+        ["Spawn Point", profile.location],
+        ["Class", profile.title],
+        ["Core Loadout", profile.primarySkills],
+        ["Play Time", profile.experience],
+        ["Current Campaign", profile.focus],
+        ["Side Quests", profile.hobbies],
       ],
       blurb:
         "Nakshatra approaches software engineering like a systems designer rather than a feature collector. His focus is on building reliable enterprise applications, developer tools, automation platforms, and AI-powered products that solve practical problems and continue delivering value long after launch.",
@@ -158,9 +158,9 @@ export const popTheme = {
     skills: {
       title: "Moves List",
       kicker: "Power Meter",
-      groups: sharedPortfolioContent.skills.map((group, index) => ({
-        ...group,
+      groups: skills.map((group, index) => ({
         title: index === 0 ? "Enterprise Tech Tree" : "Programming Arsenal",
+        skills: group.items,
       })),
     },
     projects: {
@@ -196,8 +196,7 @@ export const popTheme = {
       placeholders: {
         name: "PLAYER TAG",
         email: "EMAIL ID",
-        brief:
-          "PRODUCT, SYSTEM, OR COLLABORATION IDEA",
+        brief: "PRODUCT, SYSTEM, OR COLLABORATION IDEA",
       },
       submitLabel: "Send Invite",
       loadingLabel: "Joining Lobby...",
