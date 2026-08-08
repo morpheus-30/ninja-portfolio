@@ -1,5 +1,4 @@
 const { requireAuth } = require("../_utils/requireAuth");
-const { readDraft, hasDraft } = require("../_utils/draft");
 const { generatePortfolioFile } = require("../_utils/generatePortfolioFile");
 
 // ─── Configuration ────────────────────────────────────────────────────────────
@@ -30,12 +29,12 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "Publishing is not configured (missing GITHUB_PAT)." });
   }
 
-  // Read draft
-  if (!hasDraft()) {
-    return res.status(400).json({ error: "No draft to publish. Save a draft first." });
-  }
+  // Read draft from request body (client sends the draft data directly)
+  const draft = req.body;
 
-  const draft = readDraft();
+  if (!draft || typeof draft !== "object") {
+    return res.status(400).json({ error: "No draft data provided in request body." });
+  }
 
   // Validate draft has required fields
   const requiredKeys = ["profile", "bio", "skills", "projects"];
@@ -130,19 +129,6 @@ module.exports = async function handler(req, res) {
     }
 
     const commitData = await putResponse.json();
-
-    // ─── Step 4: Clear the draft after successful publish ───────────────────
-
-    try {
-      const fs = require("fs");
-      const path = require("path");
-      const draftPath = path.join("/tmp", "portfolio-draft.json");
-      if (fs.existsSync(draftPath)) {
-        fs.unlinkSync(draftPath);
-      }
-    } catch {
-      // Non-critical — draft cleanup failure shouldn't fail the publish response
-    }
 
     return res.status(200).json({
       published: true,

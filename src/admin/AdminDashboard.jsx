@@ -106,7 +106,7 @@ export default function AdminDashboard() {
     setSuccessMessage(null);
 
     try {
-      const result = await publishDraft();
+      const result = await publishDraft(draft);
 
       if (result.published) {
         setSuccessMessage("Published successfully. Deployment triggered.");

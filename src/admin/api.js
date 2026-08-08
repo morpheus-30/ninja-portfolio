@@ -28,17 +28,19 @@ export async function discardDraft() {
   return res.json();
 }
 
-export async function publishDraft() {
+export async function publishDraft(data) {
   const res = await fetch("/api/admin/publish", {
     method: "POST",
     credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
 
-  const data = await res.json();
+  const result = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.error || `Publish failed: ${res.status}`);
+    throw new Error(result.error || `Publish failed: ${res.status}`);
   }
 
-  return data;
+  return result;
 }
