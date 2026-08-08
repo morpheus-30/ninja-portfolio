@@ -6,14 +6,14 @@
  */
 
 export const profile = {
-  "name": "Naksh Chandna",
+  "name": "Nakshatra Chandna",
   "company": "Yamaha Motor Solutions India Pvt. Ltd.",
   "location": "Faridabad, India",
   "title": "Associate Software Engineer",
-  "primarySkills": "Python, Flutter, SAP, FastAPI, JavaScript",
+  "primarySkills": "Python, Flutter, SAP, FastAPI, JavaScript, Express",
   "experience": "1+ Years",
-  "focus": "Enterprise Systems, Automation & Developer Tools",
-  "hobbies": "Sketching, Learning Guitar, Badminton, Table Tennis"
+  "focus": "AI AI AIIIII!",
+  "hobbies": "Sketching, Guitar, Badminton, Table Tennis"
 };
 
 export const bio = {
@@ -67,7 +67,7 @@ export const skills = [
       },
       {
         "label": "Go",
-        "value": 50,
+        "value": 30,
         "color": "#5dc9e2"
       },
       {
@@ -79,6 +79,21 @@ export const skills = [
         "label": "C++",
         "value": 70,
         "color": "#6b8cff"
+      },
+      {
+        "label": "Next.js",
+        "value": 80,
+        "color": "#4f9eff"
+      },
+      {
+        "label": "Express.js",
+        "value": 80,
+        "color": "#4f9eff"
+      },
+      {
+        "label": "BetterAuth",
+        "value": 90,
+        "color": "#4f9eff"
       }
     ]
   }
@@ -87,7 +102,7 @@ export const skills = [
 export const projects = [
   {
     "title": "UNLOOP",
-    "description": "A productivity-focused platform designed to reduce short-form content consumption across applications such as YouTube Shorts and Instagram Reels. Handles real-time activity tracking, browser event detection, navigation monitoring, and behavioral analytics.",
+    "description": "A productivity-focused platform designed to reduce short-form content consumption across applications such as YouTube Shorts and Instagram Reels. Handles real-time activity tracking, browser event detection, navigation monitoring, and behavioral analytics. PSSST! Android launching soon!!",
     "tags": [
       "Behavior Tracking",
       "Realtime Systems",
@@ -96,14 +111,16 @@ export const projects = [
     "link": "https://unloop.iamnaksh.tech"
   },
   {
-    "title": "CLISKY",
-    "description": "An AI-powered command-line assistant that detects the user's environment and generates contextual commands. Built with a modular architecture supporting Linux distribution awareness, environment configuration, and AI-assisted command generation.",
+    "title": "Queryless",
+    "description": "An AI-powered platform enabling natural language querying of SAP HANA Cloud databases,\ntranslating plain-English questions into executable queries and returning contextual results. Implemented an MCP\n(Model Context Protocol) server architecture with agent-based workflows for schema understanding, query generation,\nand multi-step reasoning over enterprise data models.",
     "tags": [
-      "AI CLI",
-      "Python",
-      "System Aware"
+      "AI",
+      "MCP",
+      "SAP HANA",
+      "Express.js",
+      "AWS"
     ],
-    "link": "https://pypi.org/project/clisky/"
+    "link": "https://queryless.iamnaksh.tech/"
   },
   {
     "title": "Gitroaster",
