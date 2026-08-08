@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const { parseCookie, stringifySetCookie } = require("cookie");
+const cookie = require("cookie");
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -29,9 +29,7 @@ function isSecure() {
 }
 
 function setSessionCookie(token) {
-  return stringifySetCookie({
-    name: COOKIE_NAME,
-    value: token,
+  return cookie.serialize(COOKIE_NAME, token, {
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -41,9 +39,7 @@ function setSessionCookie(token) {
 }
 
 function clearSessionCookie() {
-  return stringifySetCookie({
-    name: COOKIE_NAME,
-    value: "",
+  return cookie.serialize(COOKIE_NAME, "", {
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -53,9 +49,7 @@ function clearSessionCookie() {
 }
 
 function setStateCookie(state) {
-  return stringifySetCookie({
-    name: STATE_COOKIE_NAME,
-    value: state,
+  return cookie.serialize(STATE_COOKIE_NAME, state, {
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -65,9 +59,7 @@ function setStateCookie(state) {
 }
 
 function clearStateCookie() {
-  return stringifySetCookie({
-    name: STATE_COOKIE_NAME,
-    value: "",
+  return cookie.serialize(STATE_COOKIE_NAME, "", {
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -80,7 +72,7 @@ function clearStateCookie() {
 
 function parseCookies(req) {
   const cookieHeader = req.headers?.cookie || "";
-  return parseCookie(cookieHeader);
+  return cookie.parse(cookieHeader);
 }
 
 function createSessionToken(username) {
