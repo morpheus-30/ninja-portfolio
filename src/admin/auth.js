@@ -18,6 +18,12 @@ export async function checkSession() {
       credentials: "include",
     });
 
+    // If the response isn't JSON (e.g. HTML fallback from a 404), treat as no session
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      return { authenticated: false, error: "no_session" };
+    }
+
     const data = await response.json();
     return data;
   } catch {

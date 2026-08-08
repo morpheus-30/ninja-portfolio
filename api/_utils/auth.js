@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const cookie = require("cookie");
+const { parseCookie, stringifySetCookie } = require("cookie");
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -13,8 +13,6 @@ const COOKIE_NAME = "__session";
 const STATE_COOKIE_NAME = "__oauth_state";
 
 function getSiteUrl() {
-  // SITE_URL should be set to your custom domain in production (e.g. https://iamnaksh.tech)
-  // This takes priority over VERCEL_URL which returns the .vercel.app subdomain
   if (process.env.SITE_URL) {
     return process.env.SITE_URL;
   }
@@ -31,7 +29,9 @@ function isSecure() {
 }
 
 function setSessionCookie(token) {
-  return cookie.serialize(COOKIE_NAME, token, {
+  return stringifySetCookie({
+    name: COOKIE_NAME,
+    value: token,
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -41,7 +41,9 @@ function setSessionCookie(token) {
 }
 
 function clearSessionCookie() {
-  return cookie.serialize(COOKIE_NAME, "", {
+  return stringifySetCookie({
+    name: COOKIE_NAME,
+    value: "",
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -51,17 +53,21 @@ function clearSessionCookie() {
 }
 
 function setStateCookie(state) {
-  return cookie.serialize(STATE_COOKIE_NAME, state, {
+  return stringifySetCookie({
+    name: STATE_COOKIE_NAME,
+    value: state,
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
     path: "/",
-    maxAge: 600, // 10 minutes
+    maxAge: 600,
   });
 }
 
 function clearStateCookie() {
-  return cookie.serialize(STATE_COOKIE_NAME, "", {
+  return stringifySetCookie({
+    name: STATE_COOKIE_NAME,
+    value: "",
     httpOnly: true,
     secure: isSecure(),
     sameSite: "Lax",
@@ -74,7 +80,7 @@ function clearStateCookie() {
 
 function parseCookies(req) {
   const cookieHeader = req.headers?.cookie || "";
-  return cookie.parse(cookieHeader);
+  return parseCookie(cookieHeader);
 }
 
 function createSessionToken(username) {
