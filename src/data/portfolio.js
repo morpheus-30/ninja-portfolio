@@ -41,7 +41,7 @@ export const skills = [
         "color": "#efc56c"
       },
       {
-        "label": "RAP",
+        "label": "SAP RAP",
         "value": 80,
         "color": "#f3ddaf"
       },
