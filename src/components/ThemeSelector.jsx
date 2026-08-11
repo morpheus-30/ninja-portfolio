@@ -254,6 +254,26 @@ export default function ThemeSelector({
           ))}
         </div>
       </div>
+      <a
+        href="/admin"
+        style={{
+          position: "fixed",
+          bottom: "1rem",
+          right: "1rem",
+          padding: "0.35rem 0.65rem",
+          borderRadius: "999px",
+          border: "1px solid rgba(255,255,255,0.06)",
+          background: "rgba(255,255,255,0.02)",
+          color: "#4a4540",
+          fontSize: "0.62rem",
+          letterSpacing: "0.04em",
+          textDecoration: "none",
+          zIndex: 3,
+          fontFamily: "'Oxanium', sans-serif",
+        }}
+      >
+        for the boss only
+      </a>
       <div
         style={{
           position: "absolute",
