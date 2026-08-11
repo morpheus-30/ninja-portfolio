@@ -123,6 +123,30 @@ export const projects = [
     "link": "https://queryless.iamnaksh.tech/"
   },
   {
+    "title": "MyNotion",
+    "description": "RAG, Retrieval-Augmented Generation, LLM, Python, Notion API, Vector Database, Qdrant, Embeddings, Voyage AI, Groq, Llama 3.3, Streamlit, Semantic Search, AI Assistant, Multi-tenant, Incremental Sync, Full-Stack AI",
+    "tags": [
+      "RAG",
+      "Retrieval-Augmented Generation",
+      "LLM",
+      "Python",
+      "Notion API",
+      "Vector Database",
+      "Qdrant",
+      "Embeddings",
+      "Voyage AI",
+      "Groq",
+      "Llama 3.3",
+      "Streamlit",
+      "Semantic Search",
+      "AI Assistant",
+      "Multi-tenant",
+      "Incremental Sync",
+      "Full-Stack AI"
+    ],
+    "link": "https://mynotion.streamlit.app/"
+  },
+  {
     "title": "Gitroaster",
     "description": "A deployed web application that analyzes GitHub profiles using repository metadata and activity patterns to generate context-aware AI-powered insights and humorous evaluations.",
     "tags": [
