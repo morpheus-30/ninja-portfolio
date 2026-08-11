@@ -1,10 +1,33 @@
+import { useEffect, useRef } from "react";
 import { useThemeTokens } from "../context/theme-context";
 import { buildCharacterActions } from "../utils/character";
+
+/**
+ * Preloads all character GIF URLs into browser cache.
+ * Called once on mount so action transitions are instant.
+ */
+function usePreloadCharacterGifs(characterAssets) {
+  const preloadedRef = useRef(false);
+
+  useEffect(() => {
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+
+    const urls = new Set(Object.values(characterAssets));
+    urls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
+  }, [characterAssets]);
+}
 
 export default function NarutoWalker({ action, direction, isMobile }) {
   const { theme } = useThemeTokens();
   const characterActions = buildCharacterActions(theme.assets.character);
   const actionConfig = characterActions[action] ?? characterActions.idle;
+
+  // Preload all GIFs so transitions are instant
+  usePreloadCharacterGifs(theme.assets.character);
 
   const frameWidth = isMobile ? 150 : 400;
   const frameHeight = isMobile ? 118 : 240;
@@ -68,9 +91,11 @@ export default function NarutoWalker({ action, direction, isMobile }) {
         transition: "width 160ms ease, height 160ms ease",
       }}
     >
+      {/* key forces a new <img> element on action change so the GIF replays from frame 1 */}
       <img
+        key={action}
         src={actionConfig.src}
-        alt="Naruto runner"
+        alt="Character"
         style={{
           position: "absolute",
           height: `${spriteHeight}px`,

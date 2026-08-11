@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ThemeSelector({
   themes,
@@ -7,10 +7,37 @@ export default function ThemeSelector({
   pendingThemeId,
 }) {
   const [isReady, setIsReady] = useState(false);
+  const bufferRef = useRef("");
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsReady(true), 40);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  // Secret "admin" keyword redirects to /admin
+  useEffect(() => {
+    const resetTimer = { current: null };
+
+    const onKeyDown = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      const key = e.key.toLowerCase();
+      if (key.length !== 1 || !/[a-z]/.test(key)) return;
+
+      bufferRef.current += key;
+      clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => { bufferRef.current = ""; }, 1500);
+
+      if (bufferRef.current.includes("admin")) {
+        bufferRef.current = "";
+        window.location.href = "/admin";
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      clearTimeout(resetTimer.current);
+    };
   }, []);
 
   return (
@@ -154,11 +181,9 @@ export default function ThemeSelector({
                     ? "translateY(-14px) scale(1.08)"
                     : "translateY(0) scale(1)"
                   : "translateY(28px) scale(0.98)",
-                transition: `opacity 540ms ease ${
-                  index * 90
-                }ms, transform 720ms cubic-bezier(0.22, 1, 0.36, 1) ${
-                  index * 90
-                }ms, border-color 220ms ease, box-shadow 220ms ease`,
+                transition: `opacity 540ms ease ${index * 90
+                  }ms, transform 720ms cubic-bezier(0.22, 1, 0.36, 1) ${index * 90
+                  }ms, border-color 220ms ease, box-shadow 220ms ease`,
                 animation: "selectorFloat 7s ease-in-out infinite",
                 animationDelay: `${index * 180}ms`,
                 pointerEvents: isEnteringTheme ? "none" : "auto",
