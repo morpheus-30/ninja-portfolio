@@ -135,16 +135,79 @@ ${staggerDelays}
     .ground-pulse { animation: groundPulse ${MOTION.runDurationMs}ms var(--ease-out) both; }
 
     /* ---------------------------------------------------------------
-       Scene backdrop. Layers crossfade; only the visible one drifts.
+       Scene backdrop, as real 3D planes.
+
+       One perspective on .scene plus a different translateZ per plane means the
+       shared pointer rotation displaces each plane by a different amount, which
+       is what actual depth looks like. The --travel property comes from the
+       character's position and is eased on the same curve as its own left
+       transition, so the scene pans exactly with it.
        --------------------------------------------------------------- */
+    .scene {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      perspective: 1100px;
+      perspective-origin: 50% 48%;
+      --travel: 0;
+      --travel-ms: ${MOTION.runDurationMs}ms;
+      --mx: 0;
+      --my: 0;
+    }
+    .scene-dolly,
+    .scene-inner {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    /* Section changes push the camera in and let it settle back. */
+    .scene-dolly { animation: scenePush ${MOTION.runDurationMs}ms var(--ease-out); }
+    @keyframes scenePush {
+      0%   { transform: translateZ(0) }
+      42%  { transform: translateZ(58px) }
+      100% { transform: translateZ(0) }
+    }
+    /* The pointer tilts the whole stack; per-plane depth turns that single
+       rotation into differential movement. */
+    .scene-inner {
+      transform:
+        rotateY(calc(var(--mx) * 2.6deg))
+        rotateX(calc(var(--my) * -1.9deg));
+      will-change: transform;
+    }
+    .scene-plane {
+      position: absolute;
+      /* Bleed past the viewport so no shift can reveal an edge. */
+      inset: -8%;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transform:
+        translate3d(
+          calc(var(--travel) * var(--shift) * -1px + var(--mx) * var(--shift) * -0.35px),
+          calc(var(--my) * var(--shift) * -0.22px),
+          calc(var(--depth) * -300px)
+        )
+        /* Counter the perspective shrink so a far plane still covers. */
+        scale(calc(1 + var(--depth) * 0.3));
+      transition: transform var(--travel-ms) cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .scene-fill { position: absolute; inset: 0; }
+    .scene-grid {
+      opacity: 0.45;
+      background-size: 84px 84px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2));
+      -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2));
+    }
+
     .backdrop-layer {
       position: absolute;
       inset: 0;
       background-size: cover;
+      background-position: center;
       background-repeat: no-repeat;
       transform: scale(1.06);
       will-change: opacity;
-      transition: opacity 900ms var(--ease-out), background-position 900ms var(--ease-out);
+      transition: opacity 900ms var(--ease-out);
     }
     /* Running the drift only on the active layer keeps four idle full-screen
        layers off the compositor. */
@@ -752,7 +815,9 @@ ${staggerDelays}
         scroll-behavior: auto !important;
       }
       .speed-lines, .hud-dot, .crt-roll, .crt-flicker { display: none; }
-      .backdrop-layer, .backdrop-layer.is-active { animation: none; }
+      .backdrop-layer, .backdrop-layer.is-active, .scene-dolly { animation: none; }
+      .scene-inner { transform: none; }
+      .scene-plane { transform: translateZ(calc(var(--depth) * -300px)) scale(calc(1 + var(--depth) * 0.3)); }
     }
   `;
 }

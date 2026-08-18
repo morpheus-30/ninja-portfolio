@@ -142,36 +142,10 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
     >
       <style>{buildGlobalStyles({ assets, C, MOTION, UI, W })}</style>
 
-      <SceneBackdrop sectionIndex={displayIdx} />
-      {/* Top atmosphere */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: UI.topAtmosphere,
-        }}
-      />
-      {/* Grid overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.45,
-          backgroundImage: UI.gridOverlay,
-          backgroundSize: "84px 84px",
-          maskImage:
-            "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2))",
-        }}
-      />
-      {/* Bottom atmosphere */}
-      <div
-        style={{
-          position: "absolute",
-          inset: "auto 0 0 0",
-          height: "45vh",
-          background: UI.bottomAtmosphere,
-          clipPath: isGameverse ? "none" : undefined,
-        }}
+      <SceneBackdrop
+        sectionIndex={displayIdx}
+        spriteX={spriteX}
+        travelMs={MOTION.runDurationMs}
       />
 
       <ThreeScene sectionIndex={displayIdx} />

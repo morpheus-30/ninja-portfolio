@@ -66,3 +66,4 @@ test("elastic easing stays out of the system", () => {
     expect(overshoot).toHaveLength(0);
   }
 });
+
