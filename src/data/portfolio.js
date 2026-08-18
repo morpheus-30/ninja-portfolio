@@ -8,7 +8,7 @@
 export const profile = {
   "name": "Nakshatra Chandna",
   "company": "Yamaha Motor Solutions India Pvt. Ltd.",
-  "location": "Faridabad, India",
+  "location": "India",
   "title": "Associate Software Engineer",
   "primarySkills": "Python, Flutter, SAP, FastAPI, JavaScript, Express",
   "experience": "1+ Years",
