@@ -1,42 +1,47 @@
 import { useThemeTokens } from "../../context/theme-context";
 import SectionShell from "../SectionShell";
-import StatCard from "../StatCard";
 
 export default function AboutSection({ content, isMobile, isTightViewport }) {
-  const { theme, C } = useThemeTokens();
-  const isGameverse = theme.id === "pop";
+  const { C } = useThemeTokens();
 
   return (
     <SectionShell
       title={content.title}
       kicker={content.kicker}
       isMobile={isMobile}
-      isTightViewport={isGameverse && isTightViewport}
+      isTightViewport={isTightViewport}
     >
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: isMobile
-            ? "repeat(2, minmax(0, 1fr))"
-            : "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "0.72rem",
-          maxWidth: "860px",
+          gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1.15fr) minmax(0, 1fr)",
+          gap: isMobile ? "1.1rem" : "2.2rem",
+          alignItems: "start",
         }}
       >
-        {content.stats.map(([label, value]) => (
-          <StatCard key={label} label={label} value={value} />
-        ))}
-      </div>
-      <div
-        style={{
-          marginTop: "1.2rem",
-          maxWidth: "860px",
-          color: C.body,
-          lineHeight: 1.8,
-          fontSize: "1rem",
-        }}
-      >
-        {content.blurb}
+        {/* A character sheet is a ledger of facts, so it reads as rows with
+            hairline rules — not eight boxes nested inside the panel box. */}
+        <dl className="ledger rise-stagger">
+          {content.stats.map(([label, value]) => (
+            <div className="ledger-row" key={label}>
+              <dt className="ledger-key">{label}</dt>
+              <dd className="ledger-value">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <p
+          style={{
+            color: C.muted,
+            lineHeight: 1.85,
+            fontSize: isMobile ? "0.95rem" : "1rem",
+            maxWidth: "62ch",
+            borderLeft: `1px solid ${C.line}`,
+            paddingLeft: isMobile ? "0.9rem" : "1.3rem",
+          }}
+        >
+          {content.blurb}
+        </p>
       </div>
     </SectionShell>
   );

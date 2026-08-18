@@ -124,26 +124,14 @@ export const projects = [
   },
   {
     "title": "MyNotion",
-    "description": "RAG, Retrieval-Augmented Generation, LLM, Python, Notion API, Vector Database, Qdrant, Embeddings, Voyage AI, Groq, Llama 3.3, Streamlit, Semantic Search, AI Assistant, Multi-tenant, Incremental Sync, Full-Stack AI",
+    "description": "A multi-tenant RAG assistant that indexes a Notion workspace and answers questions over it through semantic search. Incremental sync keeps the Qdrant vector store current as pages change, so answers stay grounded in the latest content.",
     "tags": [
-      "RAG",
-      "Retrieval-Augmented Generation",
-      "LLM",
-      "Python",
-      "Notion API",
-      "Vector Database",
-      "Qdrant",
-      "Embeddings",
-      "Voyage AI",
-      "Groq",
-      "Llama 3.3",
-      "Streamlit",
-      "Semantic Search",
-      "AI Assistant",
-      "Multi-tenant",
-      "Incremental Sync",
-      "Full-Stack AI"
-    ],
+        "RAG",
+        "Qdrant",
+        "Python",
+        "LLM",
+        "Streamlit"
+      ],
     "link": "https://mynotion.streamlit.app/"
   },
   {

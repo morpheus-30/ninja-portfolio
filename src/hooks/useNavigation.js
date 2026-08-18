@@ -69,6 +69,25 @@ export function useNavigation({ sections, MOTION, isMobile, pressedKeysRef }) {
 
   useEffect(() => {
     const onWheel = (event) => {
+      // Short viewports and mobile give the section its own scrollbar. Let the
+      // wheel scroll that content and only take over once it hits the edge,
+      // otherwise the inner scroll area is unreachable.
+      // Sections nest inside <main>, and either can be the scroller, so walk
+      // up until one still has room to move in this direction.
+      for (
+        let node = event.target?.closest?.("[data-scrollable]");
+        node;
+        node = node.parentElement?.closest("[data-scrollable]")
+      ) {
+        const maxScroll = node.scrollHeight - node.clientHeight;
+        if (maxScroll <= 1) continue;
+        const atEdge =
+          event.deltaY > 0
+            ? node.scrollTop >= maxScroll - 1
+            : node.scrollTop <= 1;
+        if (!atEdge) return;
+      }
+
       event.preventDefault();
       if (Math.abs(event.deltaY) < 18) return;
       triggerTransition(sectionRef.current + (event.deltaY > 0 ? 1 : -1));

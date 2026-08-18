@@ -1,31 +1,42 @@
-import { useThemeTokens } from "../../context/theme-context";
+import { useCallback, useState } from "react";
 import SectionShell from "../SectionShell";
 import MissionCard from "../MissionCard";
+import ProjectDialog from "../ProjectDialog";
 
 export default function ProjectsSection({ content, isMobile, isTightViewport }) {
-  const { theme } = useThemeTokens();
-  const isGameverse = theme.id === "pop";
+  const [openProject, setOpenProject] = useState(null);
+  const closeProject = useCallback(() => setOpenProject(null), []);
 
   return (
     <SectionShell
       title={content.title}
       kicker={content.kicker}
       isMobile={isMobile}
-      isTightViewport={isGameverse && isTightViewport}
+      isTightViewport={isTightViewport}
+      contentFills
     >
+      {/* The grid scrolls inside the panel, so project count never breaks the
+          layout — six or sixteen entries look the same from outside. */}
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: isMobile
-            ? "1fr"
-            : "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "1rem",
-        }}
+        className="project-grid rise-stagger"
+        data-scrollable=""
+        style={{ maxHeight: isMobile ? "none" : "min(48vh, 30rem)" }}
       >
         {content.items.map((project) => (
-          <MissionCard key={project.title} {...project} />
+          <MissionCard
+            key={project.title}
+            project={project}
+            onOpen={setOpenProject}
+            openLabel={content.openLabel}
+          />
         ))}
       </div>
+
+      <ProjectDialog
+        project={openProject}
+        onClose={closeProject}
+        labels={content.detailLabels}
+      />
     </SectionShell>
   );
 }

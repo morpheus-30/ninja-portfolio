@@ -1,6 +1,14 @@
 import { useMemo } from "react";
 import { useThemeTokens } from "../context/theme-context";
 
+/**
+ * The panel every section sits in.
+ *
+ * `kicker` is deliberately not rendered above the heading. In Naruto it runs
+ * down the left margin as an annotation; in Gameverse it becomes the cabinet's
+ * HUD title bar. Both give the label a structural job instead of stacking a
+ * second, smaller heading on top of the real one.
+ */
 export default function SectionShell({
   title,
   kicker,
@@ -8,41 +16,35 @@ export default function SectionShell({
   isMobile,
   isTightViewport,
   titleStyle,
+  contentFills = false,
 }) {
-  const { theme, C, F, UI } = useThemeTokens();
+  const { theme, C, F, UI, W } = useThemeTokens();
   const isGameverse = theme.id === "pop";
-  const mobileGameverseShellPadding = "0.72rem 0.68rem 0.82rem";
-  const mobileGameverseContentPaddingX = "1rem";
-  const mobileGameverseContentPaddingTop = "0.42rem";
-  const mobileGameverseContentPaddingBottom = "0.2rem";
-  const gameverseClip =
-    "polygon(var(--gv-cut) 0, calc(100% - var(--gv-cut)) 0, 100% var(--gv-cut), 100% calc(100% - var(--gv-cut)), calc(100% - var(--gv-cut)) 100%, var(--gv-cut) 100%, 0 calc(100% - var(--gv-cut)), 0 var(--gv-cut))";
-  const gameverseContentInset = isMobile ? "6px" : "8px";
-  const gameverseFrameSprite = {
-    position: "absolute",
-    pointerEvents: "none",
-    imageRendering: "pixelated",
-    filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.22))",
-    opacity: 0.96,
-  };
-  const randomBottomStones = useMemo(
+  const scrolls = isMobile || isTightViewport;
+
+  // In-game props scattered along the cabinet floor. Seeded per breakpoint so
+  // they do not jump on every render.
+  const groundProps = useMemo(
     () =>
-      Array.from({ length: isMobile ? 5 : 8 }, (_, index) => ({
-        id: index,
-        left: 8 + Math.random() * 84,
-        bottom: Math.random() * (isMobile ? 4 : 6),
-        width: isMobile ? 22 + Math.random() * 8 : 42 + Math.random() * 18,
-        flip: Math.random() > 0.5,
-        opacity: 0.82 + Math.random() * 0.16,
-      })),
-    [isMobile]
+      isGameverse
+        ? Array.from({ length: isMobile ? 4 : 7 }, (_, index) => ({
+            id: index,
+            left: 6 + Math.random() * 86,
+            bottom: Math.random() * (isMobile ? 4 : 6),
+            width: isMobile ? 20 + Math.random() * 8 : 36 + Math.random() * 16,
+            flip: Math.random() > 0.5,
+            opacity: 0.7 + Math.random() * 0.24,
+          }))
+        : [],
+    [isGameverse, isMobile]
   );
 
   return (
     <section
-      className={isGameverse ? "gameverse-card gameverse-boot" : undefined}
+      className="panel"
+      data-scrollable={scrolls ? "" : undefined}
       style={{
-        "--gv-cut": isMobile ? "18px" : "26px",
+        "--gv-cut": isMobile ? "14px" : "22px",
         width: isMobile
           ? "calc(100vw - 1.5rem)"
           : "min(1120px, calc(100vw - 2.5rem))",
@@ -51,109 +53,59 @@ export default function SectionShell({
           : isTightViewport
             ? "auto"
             : "min(70vh, 760px)",
-        maxHeight: isMobile
-          ? "calc(100vh - 7.5rem)"
-          : isTightViewport
-            ? "none"
-            : "none",
+        maxHeight: isMobile ? "calc(100vh - 7.5rem)" : "none",
         padding: isMobile
-          ? isGameverse
-            ? mobileGameverseShellPadding
-            : "1rem"
-          : isGameverse
-            ? "clamp(2.25rem, 3vw, 3.15rem)"
-            : "clamp(1.6rem, 2vw, 2.2rem)",
+          ? `1.05rem 1rem 1.15rem ${isGameverse ? "1rem" : "2.4rem"}`
+          : `clamp(1.7rem, 2.4vw, 2.4rem) clamp(1.7rem, 2.4vw, 2.4rem) clamp(1.7rem, 2.4vw, 2.4rem) ${
+              isGameverse ? "clamp(1.7rem, 2.4vw, 2.4rem)" : "3.3rem"
+            }`,
         border: UI.sectionBorder,
-        borderRadius: isGameverse
-          ? "0"
-          : isMobile
-            ? "14px 24px 14px 24px"
-            : "18px 42px 18px 42px",
+        borderRadius: isGameverse ? 0 : isMobile ? "4px 16px 4px 16px" : "6px 26px 6px 26px",
         background: UI.sectionBackground,
         boxShadow: UI.sectionShadow,
         display: "grid",
-        alignItems: (isMobile || isTightViewport) && isGameverse
-          ? "stretch"
-          : "center",
+        gridTemplateRows: isGameverse ? "auto auto 1fr" : "auto 1fr",
+        gap: isMobile ? "0.7rem" : "0.9rem",
+        alignContent: "start",
         position: "relative",
         overflowX: "hidden",
-        overflowY: isMobile || isTightViewport ? "auto" : "hidden",
-        WebkitOverflowScrolling: isMobile || isTightViewport ? "touch" : "auto",
-        overscrollBehavior: isMobile || isTightViewport ? "contain" : "auto",
-        touchAction: isMobile || isTightViewport ? "pan-y" : "auto",
-        clipPath: isGameverse
-          ? gameverseClip
-          : isMobile
-            ? "polygon(0 12px, 12px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 14px))"
-            : "polygon(0 18px, 18px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 20px 100%, 0 calc(100% - 20px))",
+        overflowY: scrolls ? "auto" : "hidden",
+        WebkitOverflowScrolling: scrolls ? "touch" : "auto",
+        overscrollBehavior: scrolls ? "contain" : "auto",
+        touchAction: scrolls ? "pan-y" : "auto",
+        clipPath: W.panelClip,
       }}
     >
-      {/* Shine overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: isGameverse
-            ? "linear-gradient(180deg, rgba(255,240,214,0.08) 0%, rgba(255,240,214,0.02) 18%, rgba(0,0,0,0) 24%, rgba(0,0,0,0) 100%)"
-            : "linear-gradient(140deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,0) 74%, rgba(255,255,255,0.04) 100%)",
-          opacity: isGameverse ? 0.9 : 0.55,
-          pointerEvents: "none",
-        }}
-      />
-      {/* Top-right corner accent */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: isMobile ? "96px" : "180px",
-          height: isMobile ? "96px" : "180px",
-          background: isGameverse
-            ? "linear-gradient(135deg, rgba(231,197,146,0) 0%, rgba(231,197,146,0.14) 48%, rgba(231,197,146,0) 48%)"
-            : `linear-gradient(135deg, ${C.ember}00 0%, ${C.ember}22 48%, ${C.ember}00 48%)`,
-          pointerEvents: "none",
-          opacity: isGameverse ? 0.75 : 0.95,
-        }}
-      />
-      {/* Bottom-left corner accent */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: isMobile ? "110px" : "220px",
-          height: isMobile ? "110px" : "220px",
-          background: isGameverse
-            ? "linear-gradient(315deg, rgba(108,71,39,0) 0%, rgba(108,71,39,0.18) 42%, rgba(108,71,39,0) 42%)"
-            : `linear-gradient(315deg, ${C.gold}00 0%, ${C.gold}14 42%, ${C.gold}00 42%)`,
-          pointerEvents: "none",
-          opacity: isGameverse ? 0.8 : 0.9,
-        }}
-      />
-      {/* Bottom-right line accent */}
-      <div
-        style={{
-          position: "absolute",
-          inset: isMobile ? "auto 10px 10px auto" : "auto 14px 14px auto",
-          width: isMobile ? "68px" : "108px",
-          height: "1px",
-          background: isGameverse
-            ? "linear-gradient(90deg, transparent, rgba(211,181,134,0.9))"
-            : `linear-gradient(90deg, transparent, ${C.gold})`,
-          opacity: isGameverse ? 0.5 : 0.72,
-          pointerEvents: "none",
-        }}
-      />
+      {/* World texture: paper fibre and ink bleed, or dither, phosphor stripe
+          and scanlines. Order matters — grain under content, scanlines over. */}
+      <div className="panel-layer panel-bleed" aria-hidden="true" />
+      <div className="panel-layer panel-grain" aria-hidden="true" />
+      <div className="panel-layer panel-fibre" aria-hidden="true" />
+      {isGameverse && (
+        <div className="panel-layer panel-scanline" aria-hidden="true" />
+      )}
+      {!isGameverse && <div className="panel-seal" aria-hidden="true" />}
+
       {/* Top bar */}
       <div
+        aria-hidden="true"
         style={{
           position: "absolute",
           inset: "0 0 auto 0",
-          height: "14px",
+          height: isGameverse ? "3px" : "2px",
           background: UI.sectionTopBar,
+          zIndex: 4,
         }}
       />
-      {/* Gameverse bottom stones */}
+
+      {/* Naruto: the section name as a margin annotation. */}
+      {!isGameverse && (
+        <div className="panel-rail" aria-hidden="true">
+          <span>{kicker}</span>
+        </div>
+      )}
+
+      {/* Gameverse: in-game props along the cabinet floor. */}
       {isGameverse && (
         <div
           aria-hidden="true"
@@ -162,225 +114,88 @@ export default function SectionShell({
             left: 0,
             right: 0,
             bottom: 0,
-            height: isMobile ? "44px" : "72px",
+            height: isMobile ? "40px" : "62px",
             pointerEvents: "none",
+            zIndex: 1,
           }}
         >
-          {randomBottomStones.map((stone) => (
+          <span
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${theme.assets.ui.stoneTile})`,
+              backgroundSize: isMobile ? "180px" : "220px",
+              backgroundRepeat: "repeat",
+              imageRendering: "pixelated",
+              filter: "saturate(0.45) brightness(0.42)",
+              opacity: 0.5,
+              maskImage: "linear-gradient(180deg, transparent, #000 70%)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent, #000 70%)",
+            }}
+          />
+          {groundProps.map((prop) => (
             <img
-              key={stone.id}
+              key={prop.id}
               src={theme.assets.ui.stoneSprite}
               alt=""
               style={{
-                ...gameverseFrameSprite,
-                left: `${stone.left}%`,
-                bottom: `${stone.bottom}px`,
-                width: `${stone.width}px`,
-                transform: stone.flip
+                position: "absolute",
+                left: `${prop.left}%`,
+                bottom: `${prop.bottom}px`,
+                width: `${prop.width}px`,
+                opacity: prop.opacity,
+                imageRendering: "pixelated",
+                transform: prop.flip
                   ? "translateX(-50%) scaleX(-1)"
-                  : "translateX(-50%) scaleX(1)",
-                opacity: stone.opacity,
+                  : "translateX(-50%)",
+                filter: "saturate(0.6) brightness(0.7) drop-shadow(0 4px 8px rgba(0,0,0,0.4))",
               }}
             />
           ))}
         </div>
       )}
-      {/* Subtle gradient overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: isGameverse
-            ? "linear-gradient(135deg, rgba(255,242,214,0.05) 0%, rgba(255,255,255,0) 30%, rgba(0,0,0,0) 100%)"
-            : "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 28%, rgba(255,255,255,0) 100%)",
-          pointerEvents: "none",
-        }}
-      />
-      {/* Grid texture */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: isGameverse ? 0.06 : 0.08,
-          backgroundImage: UI.sectionGrid,
-          backgroundSize: isGameverse ? "100% 100%, 44px 44px" : "34px 34px",
-          pointerEvents: "none",
-        }}
-      />
-      {/* Naruto decorative lines (top-right) */}
-      {!isGameverse && (
-        <div
+
+      {/* Gameverse: HUD title bar carries the label instead of an eyebrow. */}
+      {isGameverse && (
+        <div className="hud-bar" style={{ position: "relative", zIndex: 6 }}>
+          <span className="hud-dot" aria-hidden="true" />
+          <span>{kicker}</span>
+          <span className="hud-fill" aria-hidden="true" />
+        </div>
+      )}
+
+      <header style={{ position: "relative", zIndex: 6, display: "grid", gap: "0.5rem" }}>
+        <h2
+          className="display-title"
           style={{
-            position: "absolute",
-            top: isMobile ? "1rem" : "1.3rem",
-            right: isMobile ? "0.9rem" : "1.4rem",
-            display: "grid",
-            gap: isMobile ? "0.32rem" : "0.42rem",
-            opacity: 0.5,
-            pointerEvents: "none",
+            fontFamily: F.display,
+            fontSize: isMobile
+              ? "clamp(1.9rem, 10vw, 2.9rem)"
+              : "clamp(2.3rem, 4.6vw, 4.2rem)",
+            lineHeight: isMobile ? 1 : 0.95,
+            textTransform: "uppercase",
+            color: C.text,
+            ...titleStyle,
           }}
         >
-          {[0, 1, 2].map((index) => (
-            <div
-              key={index}
-              style={{
-                width: isMobile ? "28px" : "42px",
-                height: "2px",
-                background:
-                  index === 1
-                    ? `linear-gradient(90deg, ${C.gold}, ${C.ember})`
-                    : C.line,
-              }}
-            />
-          ))}
-        </div>
-      )}
-      {/* Content wrapper */}
+          {title}
+        </h2>
+        <div
+          className="title-rule"
+          aria-hidden="true"
+          style={{ width: isMobile ? "62%" : "42%" }}
+        />
+      </header>
+
       <div
         style={{
           position: "relative",
-          zIndex: 1,
-          minHeight: (isMobile || isTightViewport) && isGameverse
-            ? "100%"
-            : "auto",
-          overflow: "visible",
-          paddingRight: isMobile
-            ? isGameverse
-              ? mobileGameverseContentPaddingX
-              : "0.2rem"
-            : isGameverse
-              ? "0.9rem"
-              : 0,
-          paddingTop: isMobile
-            ? isGameverse
-              ? mobileGameverseContentPaddingTop
-              : "0.15rem"
-            : isGameverse
-              ? "0.8rem"
-              : "0.2rem",
-          paddingBottom:
-            isGameverse
-              ? isMobile
-                ? mobileGameverseContentPaddingBottom
-                : "0.9rem"
-              : 0,
-          paddingLeft:
-            isGameverse
-              ? isMobile
-                ? mobileGameverseContentPaddingX
-                : "0.9rem"
-              : 0,
+          zIndex: 6,
+          minHeight: 0,
+          display: contentFills ? "grid" : "block",
         }}
       >
-        {/* Gameverse content background layers */}
-        {isGameverse && (
-          <div
-            style={{
-              position: "absolute",
-              inset: gameverseContentInset,
-              clipPath: gameverseClip,
-              background:
-                "linear-gradient(180deg, rgba(152,108,63,0.46) 0%, rgba(112,74,40,0.5) 46%, rgba(85,53,29,0.56) 100%)",
-              boxShadow:
-                "inset 0 2px 0 rgba(255,233,188,0.16), inset 0 -3px 0 rgba(59,32,13,0.36)",
-              opacity: 0.72,
-              pointerEvents: "none",
-              zIndex: 0,
-            }}
-          />
-        )}
-        {isGameverse && (
-          <div
-            style={{
-              position: "absolute",
-              inset: gameverseContentInset,
-              clipPath: gameverseClip,
-              background:
-                "linear-gradient(180deg, rgba(255,221,165,0.07) 0 2%, rgba(0,0,0,0) 2% 24%, rgba(68,42,20,0.18) 24% 26%, rgba(0,0,0,0) 26% 48%, rgba(68,42,20,0.18) 48% 50%, rgba(0,0,0,0) 50% 72%, rgba(68,42,20,0.18) 72% 74%, rgba(0,0,0,0) 74% 100%), linear-gradient(90deg, rgba(247,221,168,0.05), rgba(95,58,29,0.12) 28%, rgba(247,221,168,0.03) 54%, rgba(95,58,29,0.12) 78%, rgba(247,221,168,0.05))",
-              opacity: 0.46,
-              pointerEvents: "none",
-              zIndex: 1,
-            }}
-          />
-        )}
-        {isGameverse && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              clipPath: "none",
-              backgroundImage: `url(${theme.assets.ui.stoneTile})`,
-              backgroundRepeat: "repeat",
-              backgroundSize: isMobile ? "280px 280px" : "340px 340px",
-              backgroundPosition: "center top",
-              filter: "saturate(0.9) brightness(0.68)",
-              opacity: 0.2,
-              pointerEvents: "none",
-              zIndex: 2,
-            }}
-          />
-        )}
-        {isGameverse && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              border: "4px solid rgba(86, 71, 56, 0.96)",
-              borderRadius: 0,
-              clipPath: gameverseClip,
-              boxShadow:
-                "inset 0 0 0 2px rgba(58,45,33,0.95), inset 0 0 0 8px rgba(191,168,125,0.12)",
-              opacity: 1,
-              pointerEvents: "none",
-              zIndex: 3,
-            }}
-          />
-        )}
-        {/* Main content */}
-        <div style={{ position: "relative", zIndex: 4 }}>
-          <p
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.55rem",
-              color: C.gold,
-              letterSpacing: "0.28em",
-              textTransform: "uppercase",
-              fontSize: "0.74rem",
-              marginBottom: "0.7rem",
-              fontFamily: F.display,
-            }}
-          >
-            <span
-              style={{
-                width: isMobile ? "24px" : "34px",
-                height: "2px",
-                background: `linear-gradient(90deg, ${C.ember}, ${C.gold})`,
-                display: "inline-block",
-                flex: "0 0 auto",
-              }}
-            />
-            {kicker}
-          </p>
-          <h2
-            style={{
-              fontFamily: F.display,
-              fontSize: isMobile
-                ? "clamp(1.9rem, 11vw, 3rem)"
-                : "clamp(2.4rem, 5vw, 4.8rem)",
-              lineHeight: isMobile ? 1 : 0.95,
-              color: C.text,
-              marginBottom: isMobile ? "0.9rem" : "1.25rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-              textShadow: `0 0 24px ${C.ember}22`,
-              ...titleStyle,
-            }}
-          >
-            {title}
-          </h2>
-          {children}
-        </div>
+        {children}
       </div>
     </section>
   );

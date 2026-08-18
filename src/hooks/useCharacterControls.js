@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 import { isTypingTarget, getSectionPoints } from "../utils/helpers";
 import { pickRandomAction, getActionDuration } from "../utils/character";
 
+/** Transient actions play once and then hand back to idle/crouch. */
+const TRANSIENT_KEYS = ["w", "e"];
+const HANDLED_KEYS = ["w", "a", "s", "d", "e"];
+
 export function useCharacterControls({
   activeTheme,
   sections,
@@ -14,6 +18,18 @@ export function useCharacterControls({
 }) {
   const actionTimerRef = useRef(null);
   const sectionPoints = useMemo(() => getSectionPoints(sections), [sections]);
+
+  /**
+   * The handlers need to read the current action, but they must not be rebuilt
+   * when it changes: this effect's cleanup clears the pending end-timer, so
+   * depending on `characterAction` meant setting an action tore down the very
+   * timer meant to end it — the sprite then looped that GIF forever. Mirroring
+   * it into a ref keeps the listeners mounted once and the timer intact.
+   */
+  const actionRef = useRef(characterAction);
+  useEffect(() => {
+    actionRef.current = characterAction;
+  }, [characterAction]);
 
   useEffect(() => {
     const closestSectionIndex = () => {
@@ -32,16 +48,21 @@ export function useCharacterControls({
     };
 
     const endTransientAction = () => {
-      const keys = pressedKeysRef.current;
-      if (keys.has("s")) {
-        setCharacterAction("crouch");
-      } else {
-        setCharacterAction("idle");
-      }
+      actionTimerRef.current = null;
+      setCharacterAction(pressedKeysRef.current.has("s") ? "crouch" : "idle");
+    };
+
+    const startTransientAction = (action) => {
+      setCharacterAction(action);
+      window.clearTimeout(actionTimerRef.current);
+      actionTimerRef.current = window.setTimeout(
+        endTransientAction,
+        getActionDuration(activeTheme, action)
+      );
     };
 
     const moveToSectionPoint = (step) => {
-      if (characterAction === "jump") return;
+      if (actionRef.current === "jump") return;
 
       const currentIndex = closestSectionIndex();
       const nextIndex = Math.max(
@@ -56,7 +77,7 @@ export function useCharacterControls({
 
     const onActionKeyDown = (event) => {
       const key = event.key.toLowerCase();
-      if (!["w", "a", "s", "d", "e"].includes(key)) return;
+      if (!HANDLED_KEYS.includes(key)) return;
       if (
         isTypingTarget(event.target) ||
         isTypingTarget(document.activeElement)
@@ -64,19 +85,22 @@ export function useCharacterControls({
         return;
       }
 
-      if (["w", "a", "s", "d"].includes(key)) {
+      if (key !== "e") {
         event.preventDefault();
       }
 
+      // Holding a key auto-repeats keydown. For a one-shot action that would
+      // re-arm the end-timer on every repeat and stall the animation.
+      if (event.repeat && TRANSIENT_KEYS.includes(key)) return;
+
       pressedKeysRef.current.add(key);
-      window.clearTimeout(actionTimerRef.current);
 
       if (
         (key === "a" || key === "d") &&
         ((activeTheme.id === "pop" && pressedKeysRef.current.has("s")) ||
           pressedKeysRef.current.has("w") ||
-          (activeTheme.id === "pop" && characterAction === "crouch") ||
-          characterAction === "jump")
+          (activeTheme.id === "pop" && actionRef.current === "crouch") ||
+          actionRef.current === "jump")
       ) {
         return;
       }
@@ -86,33 +110,26 @@ export function useCharacterControls({
       } else if (key === "d") {
         moveToSectionPoint(1);
       } else if (key === "s") {
+        window.clearTimeout(actionTimerRef.current);
         setCharacterAction("crouch");
       } else if (key === "w") {
-        setCharacterAction("jump");
-        actionTimerRef.current = window.setTimeout(
-          endTransientAction,
-          getActionDuration(activeTheme, "jump")
-        );
+        startTransientAction("jump");
       } else if (key === "e") {
-        const attackAction = pressedKeysRef.current.has("s")
-          ? pickRandomAction([
-            "crouchAttack1",
-            "crouchAttack2",
-            "crouchAttack3",
-          ])
-          : pickRandomAction(["attack1", "attack2", "attack3"]);
-
-        setCharacterAction(attackAction);
-        actionTimerRef.current = window.setTimeout(
-          endTransientAction,
-          getActionDuration(activeTheme, attackAction)
+        startTransientAction(
+          pressedKeysRef.current.has("s")
+            ? pickRandomAction([
+                "crouchAttack1",
+                "crouchAttack2",
+                "crouchAttack3",
+              ])
+            : pickRandomAction(["attack1", "attack2", "attack3"])
         );
       }
     };
 
     const onActionKeyUp = (event) => {
       const key = event.key.toLowerCase();
-      if (!["w", "a", "s", "d", "e"].includes(key)) return;
+      if (!HANDLED_KEYS.includes(key)) return;
       if (
         isTypingTarget(event.target) ||
         isTypingTarget(document.activeElement)
@@ -121,15 +138,20 @@ export function useCharacterControls({
       }
       pressedKeysRef.current.delete(key);
 
-      if (
-        key === "s" &&
-        !pressedKeysRef.current.has("w") &&
-        !pressedKeysRef.current.has("e")
-      ) {
-        if (lockRef.current && characterAction === "crouchWalk") {
-          return;
-        }
+      // A transient action owns the sprite until its timer fires, so releasing
+      // a key mid-animation must not cut it short.
+      const midTransient = actionTimerRef.current != null && [
+        "jump",
+        "attack1",
+        "attack2",
+        "attack3",
+        "crouchAttack1",
+        "crouchAttack2",
+        "crouchAttack3",
+      ].includes(actionRef.current);
 
+      if (key === "s" && !midTransient) {
+        if (lockRef.current && actionRef.current === "crouchWalk") return;
         setCharacterAction("idle");
       }
 
@@ -140,19 +162,16 @@ export function useCharacterControls({
       ) {
         if (
           lockRef.current ||
-          characterAction === "run" ||
-          characterAction === "crouchWalk"
+          midTransient ||
+          actionRef.current === "run" ||
+          actionRef.current === "crouchWalk"
         ) {
           return;
         }
 
-        if (
-          !pressedKeysRef.current.has("w") &&
-          !pressedKeysRef.current.has("s") &&
-          !pressedKeysRef.current.has("e")
-        ) {
-          setCharacterAction("idle");
-        }
+        setCharacterAction(
+          pressedKeysRef.current.has("s") ? "crouch" : "idle"
+        );
       }
     };
 
@@ -165,7 +184,6 @@ export function useCharacterControls({
     };
   }, [
     activeTheme,
-    characterAction,
     sectionPoints,
     sections.length,
     triggerTransition,

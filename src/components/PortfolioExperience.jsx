@@ -13,7 +13,7 @@ import ProjectsSection from "./sections/ProjectsSection";
 import ContactSection from "./sections/ContactSection";
 
 export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
-  const { theme, C, F, MOTION, UI } = useThemeTokens();
+  const { theme, C, F, MOTION, UI, W } = useThemeTokens();
   const isGameverse = theme.id === "pop";
   const { assets, content, sections } = activeTheme;
   const CONTROLS_CONTENT = content.controls;
@@ -124,6 +124,7 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
 
   return (
     <div
+      className={`t-${theme.id}`}
       style={{
         width: "100vw",
         height: "100vh",
@@ -133,12 +134,12 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
         fontFamily: F.body,
         color: C.text,
         opacity: isThemeMounted ? 1 : 0,
-        transform: isThemeMounted ? "scale(1)" : "scale(1.025)",
+        transform: isThemeMounted ? "none" : "scale(1.025)",
         transition:
           "opacity 560ms cubic-bezier(0.22, 1, 0.36, 1), transform 760ms cubic-bezier(0.22, 1, 0.36, 1)",
       }}
     >
-      <style>{buildGlobalStyles({ assets, C })}</style>
+      <style>{buildGlobalStyles({ assets, C, MOTION, UI, W })}</style>
 
       {/* Background image */}
       <div
@@ -198,10 +199,11 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             : "min(1120px, calc(100vw - 1.5rem))",
           zIndex: 30,
           padding: isMobile ? "0.55rem 0.6rem" : "0.75rem 1rem",
-          borderRadius: 0,
-          border: "4px solid transparent",
-          background: "rgba(9, 8, 10, 0.88)",
-          backdropFilter: "blur(10px)",
+          borderRadius: isGameverse ? 0 : "999px",
+          border: `1px solid ${C.line}`,
+          background: UI.navBackground,
+          backdropFilter: "blur(12px) saturate(115%)",
+          boxShadow: "0 14px 30px -12px rgba(0,0,0,0.7)",
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           justifyContent: "space-between",
@@ -238,32 +240,20 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           }}
         >
           <button
+            type="button"
             onClick={onSwitchTheme}
-            className={
-              isGameverse
-                ? "gameverse-nav-button gameverse-theme-button"
-                : undefined
-            }
+            className="nav-item"
             style={{
-              borderRadius: isGameverse ? "0" : "999px",
               border: `1px solid ${C.line}`,
               background: UI.themeButtonBackground,
-              color: isGameverse ? "#d6c49d" : C.sand,
+              color: C.sand,
+              borderRadius: isGameverse ? 0 : "999px",
               padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
               textTransform: "uppercase",
-              letterSpacing: isGameverse ? "0.14em" : "0.12em",
-              cursor: "pointer",
-              fontFamily: isGameverse
-                ? "'VT323', 'PixelGame', monospace"
-                : F.display,
+              letterSpacing: "0.12em",
+              fontFamily: isGameverse ? "'VT323', monospace" : F.display,
+              fontSize: isGameverse ? "1.1rem" : isMobile ? "0.82rem" : "0.95rem",
               whiteSpace: "nowrap",
-              fontSize: isGameverse
-                ? isMobile
-                  ? "0.98rem"
-                  : "1.12rem"
-                : isMobile
-                  ? "0.82rem"
-                  : "1rem",
               flex: "0 0 auto",
             }}
           >
@@ -272,50 +262,28 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
           {sections.map((section, idx) => (
             <button
               key={section}
+              type="button"
               onClick={() => triggerTransition(idx)}
-              className={
-                isGameverse
-                  ? `gameverse-nav-button ${idx === sectionIdx ? "is-active" : ""}`
-                  : undefined
-              }
+              aria-current={idx === sectionIdx ? "page" : undefined}
+              className={`nav-item ${idx === sectionIdx ? "is-active" : ""} ${
+                isGameverse ? "gameverse-nav-button" : ""
+              }`}
               style={{
-                borderRadius: isGameverse ? "0" : "999px",
-                border: `1px solid ${idx === sectionIdx ? "rgba(239,197,108,0.55)" : "transparent"}`,
-                background: isGameverse
-                  ? "transparent"
-                  : idx === sectionIdx
-                    ? "rgba(239,197,108,0.12)"
-                    : "transparent",
-                color: isGameverse
-                  ? idx === sectionIdx
-                    ? "#f4d98f"
-                    : "#d6c49d"
-                  : idx === sectionIdx
-                    ? C.text
-                    : C.muted,
+                border: "1px solid transparent",
+                borderRadius: isGameverse ? 0 : "999px",
+                background: "transparent",
+                color: idx === sectionIdx ? C.text : C.muted,
                 padding: isMobile ? "0.42rem 0.72rem" : "0.45rem 0.9rem",
                 textTransform: "uppercase",
-                letterSpacing: isGameverse ? "0.14em" : "0.12em",
-                cursor: "pointer",
-                fontFamily: isGameverse
-                  ? "'VT323', 'PixelGame', monospace"
-                  : F.display,
+                letterSpacing: "0.12em",
+                fontFamily: isGameverse ? "'VT323', monospace" : F.display,
+                fontSize: isGameverse ? "1.1rem" : isMobile ? "0.82rem" : "0.95rem",
                 whiteSpace: "nowrap",
-                fontSize: isGameverse
-                  ? isMobile
-                    ? "0.98rem"
-                    : "1.12rem"
-                  : isMobile
-                    ? "0.82rem"
-                    : "1rem",
               }}
             >
               <span className={isGameverse ? "gameverse-nav-label" : undefined}>
                 {section}
               </span>
-              {isGameverse && idx === sectionIdx ? (
-                <span className="gameverse-nav-dot" aria-hidden="true" />
-              ) : null}
             </button>
           ))}
         </div>
@@ -323,33 +291,42 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
 
       {/* Main content */}
       <main
+        data-scrollable={
+          isMobile || isTightViewport ? "" : undefined
+        }
         style={{
           position: "relative",
           zIndex: 20,
           width: "100%",
           height: "100%",
           display: "grid",
-          placeItems: isMobile || (isGameverse && isTightViewport)
+          placeItems: isMobile || isTightViewport
             ? "start center"
             : "center",
           padding: isMobile
-            ? isGameverse
-              ? "5.85rem 0.5rem 1.15rem"
-              : "5.85rem 0.75rem 1.25rem"
-            : isGameverse && isTightViewport
-              ? "6.45rem 0.9rem 1.2rem"
+            ? "5.85rem 0.6rem 1.2rem"
+            : isTightViewport
+              ? "6.2rem 0.9rem 1.4rem"
               : "5.8rem 0.9rem 8.8rem",
           opacity: visible ? 1 : 0,
-          transform: visible ? "scale(1)" : "scale(0.985)",
-          transition: "opacity 320ms ease, transform 320ms ease",
-          overflowY: isMobile || (isGameverse && isTightViewport)
+          // Exit fade only — the entrance is owned by the keyed
+          // .section-enter-* animation below so it can be directional.
+          transition: "opacity 260ms ease",
+          overflowY: isMobile || isTightViewport
             ? "auto"
             : "hidden",
           overflowX: "hidden",
           WebkitOverflowScrolling:
-            isMobile || (isGameverse && isTightViewport) ? "touch" : "auto",
+            isMobile || isTightViewport ? "touch" : "auto",
         }}
       >
+        <div
+          key={displayIdx}
+          className={
+            direction === "left" ? "section-enter-left" : "section-enter-right"
+          }
+          style={{ width: "100%", display: "grid", placeItems: "inherit" }}
+        >
         {displayIdx === 0 && (
           <HomeSection
             content={content.home}
@@ -391,6 +368,7 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
             isTightViewport={isTightViewport}
           />
         )}
+        </div>
       </main>
 
       {/* Character runner bar (desktop only) */}
@@ -462,8 +440,10 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               />
             </div>
           )}
-          {/* Ground glow line */}
+          {/* Ground glow line — flares on arrival */}
           <div
+            key={`ground-${displayIdx}`}
+            className="ground-pulse"
             style={{
               position: "absolute",
               inset: isMobile ? "auto 0 12px 0" : "auto 0 18px 0",
@@ -481,7 +461,7 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
               left: `${spriteX}%`,
               bottom: isMobile ? "8px" : "12px",
               transform: "translateX(-50%)",
-              transition: "left 680ms cubic-bezier(0.2, 0.9, 0.3, 1)",
+              transition: `left ${MOTION.runDurationMs}ms cubic-bezier(0.2, 0.9, 0.3, 1)`,
               pointerEvents: "auto",
             }}
           >
@@ -521,8 +501,19 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
                 bottom: isMobile ? "4px" : "6px",
                 width: isMobile ? "78px" : "110px",
                 height: isMobile ? "18px" : "28px",
-                transform: "translateX(-50%)",
-                transition: "width 160ms ease",
+                // The shadow answers to the sprite: it tightens and fades as
+                // the character leaves the ground, and spreads when crouching.
+                transform: `translateX(-50%) scale(${
+                  characterAction === "jump"
+                    ? 0.58
+                    : characterAction === "crouch" ||
+                        characterAction === "crouchWalk"
+                      ? 1.16
+                      : 1
+                })`,
+                opacity: characterAction === "jump" ? 0.45 : 1,
+                transition:
+                  "transform 240ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease",
                 background:
                   "radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0) 72%)",
               }}

@@ -20,7 +20,9 @@ export default function ThreeScene({ sectionIndex }) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 1000);
     const particles = new THREE.BufferGeometry();
-    const count = 160;
+    const scene3d = theme.design.scene ?? {};
+    const count = scene3d.particleCount ?? 160;
+    const rise = scene3d.particleRise ?? 0.015;
     const positions = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i += 1) {
@@ -41,7 +43,7 @@ export default function ThreeScene({ sectionIndex }) {
         map: texture,
         transparent: true,
         alphaTest: 0.1,
-        size: theme.id === "pop" ? 0.28 : 0.7,
+        size: scene3d.particleSize ?? 0.7,
         depthWrite: false,
         color: 0xffffff,
       })
@@ -50,7 +52,7 @@ export default function ThreeScene({ sectionIndex }) {
     const sweep = new THREE.Mesh(
       new THREE.PlaneGeometry(40, 26),
       new THREE.MeshBasicMaterial({
-        color: 0x2e140b,
+        color: new THREE.Color(scene3d.sweepColor ?? "#2e140b"),
         transparent: true,
         opacity: 0,
       })
@@ -60,7 +62,8 @@ export default function ThreeScene({ sectionIndex }) {
     scene.add(pointCloud);
     scene.add(sweep);
 
-    renderer.setPixelRatio(window.devicePixelRatio);
+    // Capping at 2 keeps a full-screen canvas cheap on 3x displays.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.domElement.style.position = "absolute";
     renderer.domElement.style.inset = "0";
     renderer.domElement.style.pointerEvents = "none";
@@ -89,7 +92,7 @@ export default function ThreeScene({ sectionIndex }) {
 
       const pointPositions = particles.attributes.position.array;
       for (let i = 0; i < count; i += 1) {
-        pointPositions[i * 3 + 1] += 0.015;
+        pointPositions[i * 3 + 1] += rise;
         pointPositions[i * 3] += Math.sin(t + i * 0.3) * 0.0025;
         if (pointPositions[i * 3 + 1] > 8) pointPositions[i * 3 + 1] = -8;
       }
@@ -144,7 +147,7 @@ export default function ThreeScene({ sectionIndex }) {
       if (mount.contains(renderer.domElement))
         mount.removeChild(renderer.domElement);
     };
-  }, [theme.assets.ui.particleSprite, theme.id]);
+  }, [theme.assets.ui.particleSprite, theme.design.scene]);
 
   useEffect(() => {
     const scene = sceneRef.current;

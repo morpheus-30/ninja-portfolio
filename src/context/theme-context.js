@@ -27,5 +27,6 @@ export function useThemeTokens() {
     F: theme.design.fonts,
     MOTION: theme.design.motion,
     UI: theme.design.chrome,
+    W: theme.design.world,
   };
 }

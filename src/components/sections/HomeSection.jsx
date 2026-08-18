@@ -6,77 +6,48 @@ export default function HomeSection({
   assets,
   activeTheme,
   isMobile,
-  isTightViewport,
   isCompactHero,
   isTightGameverseHero,
   heroPortraitMaxHeight,
   triggerTransition,
+  isTightViewport,
 }) {
-  const { theme, C, F, UI } = useThemeTokens();
-  const isGameverse = theme.id === "pop";
+  const { C } = useThemeTokens();
+  const stacked = isMobile || isCompactHero;
 
   return (
     <SectionShell
       title={content.title}
       kicker={content.kicker}
       isMobile={isMobile}
-      isTightViewport={isGameverse && isTightViewport}
+      isTightViewport={isTightViewport}
       titleStyle={{
         fontSize: isMobile
-          ? "clamp(1.9rem, 10vw, 2.8rem)"
+          ? "clamp(2rem, 11vw, 3rem)"
           : isCompactHero
-            ? "clamp(2rem, 3.8vw, 3.4rem)"
-            : "clamp(2.2rem, 4.5vw, 4rem)",
-        lineHeight: isMobile ? 1 : 0.98,
+            ? "clamp(2.1rem, 4vw, 3.4rem)"
+            : "clamp(2.4rem, 5vw, 4.6rem)",
       }}
     >
       <div
         style={{
           display: "grid",
-          gridTemplateColumns:
-            isMobile || isCompactHero
-              ? "minmax(0, 1fr)"
-              : isTightGameverseHero
-                ? "minmax(0, 1.35fr) minmax(160px, 0.45fr)"
-                : "minmax(0, 1.3fr) minmax(240px, 0.7fr)",
-          gap: isMobile
-            ? "1rem"
+          gridTemplateColumns: stacked
+            ? "minmax(0, 1fr)"
             : isTightGameverseHero
-              ? "0.9rem"
-              : isCompactHero
-                ? "1.25rem"
-                : "1.6rem",
-          alignItems: isMobile || isCompactHero ? "start" : "center",
+              ? "minmax(0, 1.4fr) minmax(150px, 0.4fr)"
+              : "minmax(0, 1.35fr) minmax(220px, 0.62fr)",
+          gap: isMobile ? "1.1rem" : isTightGameverseHero ? "1.1rem" : "2rem",
+          alignItems: stacked ? "start" : "center",
         }}
       >
-        <div
-          style={{
-            maxWidth: isCompactHero ? "100%" : "720px",
-            padding: isGameverse
-              ? isMobile
-                ? "1.15rem 1.2rem 1.25rem"
-                : isTightGameverseHero
-                  ? "1.25rem 1.45rem 1.35rem"
-                  : "1.8rem 2rem 1.9rem"
-              : 0,
-            borderRadius: isGameverse ? "12px" : 0,
-            border: isGameverse
-              ? "1px solid rgba(240, 214, 175, 0.22)"
-              : "none",
-            background: isGameverse
-              ? "linear-gradient(180deg, rgba(22,17,13,0.44) 0%, rgba(10,7,6,0.58) 100%)"
-              : "transparent",
-            boxShadow: isGameverse
-              ? "inset 0 1px 0 rgba(255,241,216,0.08), 0 10px 18px rgba(0,0,0,0.12)"
-              : "none",
-          }}
-        >
+        <div style={{ maxWidth: isCompactHero ? "100%" : "62ch" }}>
           <p
             style={{
-              fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
+              fontSize: "clamp(1.05rem, 1.9vw, 1.32rem)",
               color: C.sand,
-              marginBottom: isGameverse ? "1.1rem" : "0.8rem",
-              lineHeight: isTightGameverseHero ? 1.42 : 1.5,
+              lineHeight: 1.55,
+              marginBottom: "0.9rem",
             }}
           >
             {content.intro}
@@ -87,74 +58,44 @@ export default function HomeSection({
               style={{
                 color: C.muted,
                 lineHeight: 1.8,
-                maxWidth: "640px",
+                fontSize: isMobile || isTightGameverseHero ? "0.93rem" : "0.98rem",
                 marginBottom:
-                  index === content.paragraphs.length - 1
-                    ? isGameverse
-                      ? "1.65rem"
-                      : "1.4rem"
-                    : isGameverse
-                      ? "1.12rem"
-                      : "1rem",
-                fontSize: isMobile ? "0.96rem" : "1rem",
-                ...(isTightGameverseHero
-                  ? { fontSize: "0.92rem", lineHeight: 1.62 }
-                  : null),
+                  index === content.paragraphs.length - 1 ? "1.5rem" : "0.85rem",
               }}
             >
               {paragraph}
             </p>
           ))}
           <div
-            style={{
-              display: "flex",
-              gap: isGameverse ? "0.9rem 1rem" : "0.8rem",
-              flexWrap: "wrap",
-            }}
+            className="rise-stagger"
+            style={{ display: "flex", gap: "0.7rem", flexWrap: "wrap" }}
           >
-            {content.ctas.map(([label, idx]) => (
+            {content.ctas.map(([label, idx], index) => (
               <button
                 key={label}
+                type="button"
                 onClick={() => triggerTransition(idx)}
-                className={
-                  isGameverse ? "gameverse-hud-button" : undefined
-                }
-                style={{
-                  padding: "0.8rem 1.15rem",
-                  borderRadius: "999px",
-                  border: `1px solid ${C.gold}`,
-                  background:
-                    label === "View Missions"
-                      ? `linear-gradient(90deg, ${C.ember}, ${C.sunset})`
-                      : "transparent",
-                  color: C.text,
-                  cursor: "pointer",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  fontFamily: F.display,
-                }}
+                className={`cta ${index === 0 ? "is-primary" : ""}`}
               >
                 {label}
               </button>
             ))}
           </div>
         </div>
-        {!isMobile && (
-          <div
+
+        {!stacked && (
+          <figure
             style={{
               justifySelf: "center",
-              width: isCompactHero
-                ? "min(100%, 220px)"
-                : isTightGameverseHero
-                  ? "min(100%, 190px)"
-                  : "min(100%, 290px)",
+              width: isTightGameverseHero ? "min(100%, 180px)" : "min(100%, 260px)",
               aspectRatio: "4 / 5",
               maxHeight: `${heroPortraitMaxHeight}px`,
-              borderRadius: "28px",
               overflow: "hidden",
+              position: "relative",
               border: `1px solid ${C.line}`,
-              background: UI.mediaFrameBackground,
-              boxShadow: "0 18px 50px rgba(0,0,0,0.3)",
+              borderRadius: activeTheme.id === "pop" ? 0 : "4px 28px 4px 28px",
+              boxShadow:
+                "0 26px 50px -16px rgba(0,0,0,0.7), 0 6px 14px -6px rgba(0,0,0,0.5)",
             }}
           >
             <img
@@ -166,10 +107,23 @@ export default function HomeSection({
                 objectFit: "cover",
                 objectPosition: "center top",
                 display: "block",
-                filter: "saturate(0.94) contrast(1.03)",
+                filter: "saturate(0.92) contrast(1.05)",
               }}
             />
-          </div>
+            {/* Ties the portrait into the world instead of leaving it a
+                rectangle pasted on top. */}
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  activeTheme.id === "pop"
+                    ? "linear-gradient(180deg, rgba(111,247,255,0.08), rgba(4,6,11,0.42))"
+                    : "linear-gradient(180deg, rgba(194,65,12,0.08), rgba(12,8,6,0.44))",
+              }}
+            />
+          </figure>
         )}
       </div>
     </SectionShell>

@@ -23,8 +23,7 @@ export default function ThemeLoadingScreen({ theme }) {
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "radial-gradient(circle at center, rgba(239,197,108,0.1) 0%, rgba(239,197,108,0.04) 16%, rgba(0,0,0,0) 42%)",
+          background: `radial-gradient(circle at center, ${C.ember}2e 0%, ${C.gold}14 18%, rgba(0,0,0,0) 46%)`,
           pointerEvents: "none",
         }}
       />
@@ -79,6 +78,33 @@ export default function ThemeLoadingScreen({ theme }) {
         >
           {theme.content.controls.loadingText}
         </div>
+        <div
+          aria-hidden="true"
+          style={{
+            width: isMobile ? "58vw" : "220px",
+            height: "3px",
+            background: "rgba(255,255,255,0.08)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: "40%",
+              height: "100%",
+              background: `linear-gradient(90deg, ${C.ember}, ${C.gold})`,
+              animation: "loadSweep 1.15s cubic-bezier(0.45,0.05,0.55,0.95) infinite",
+            }}
+          />
+        </div>
+        <style>{`
+          @keyframes loadSweep {
+            0% { transform: translateX(-110%); }
+            100% { transform: translateX(320%); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 1ms !important; }
+          }
+        `}</style>
       </div>
     </div>
   );
