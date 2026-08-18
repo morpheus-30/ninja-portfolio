@@ -8,6 +8,15 @@ import { bayerDither, phosphorGrid } from "./textures";
  * data layer. This theme only controls presentation: labels, kickers, styling,
  * and visual configuration.
  */
+const POP_GROUP_TITLES = {
+  Languages: "Base Stats",
+  "Frameworks & Libraries": "Equipped Gear",
+  "Database & APIs": "Inventory",
+  "Cloud & Tools": "Perks",
+  "Enterprise Technologies": "Enterprise Tech Tree",
+  "Programming Languages & Frameworks": "Programming Arsenal",
+};
+
 export function buildPopTheme(data = defaultData) {
   const { profile, bio, skills, projects } = data;
 
@@ -218,9 +227,12 @@ export function buildPopTheme(data = defaultData) {
         // Theme-specific labels
         title: "Moves List",
         kicker: "Power Meter",
-        // Shared portfolio content (with themed group titles)
-        groups: skills.map((group, index) => ({
-          title: index === 0 ? "Enterprise Tech Tree" : "Programming Arsenal",
+        // Themed per category rather than by position: the old index check
+        // titled every group after the first "Programming Arsenal", so adding
+        // categories produced duplicates. Unknown categories keep their own
+        // name, so new ones are never mislabelled.
+        groups: skills.map((group) => ({
+          title: POP_GROUP_TITLES[group.category] ?? group.category,
           skills: group.items,
         })),
       },

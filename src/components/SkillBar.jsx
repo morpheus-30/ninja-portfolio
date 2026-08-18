@@ -35,13 +35,9 @@ export default function SkillBar({ label, value, color }) {
               src={sprite}
               alt=""
               aria-hidden="true"
-              className="heart-pop"
+              className="heart-pop heart"
               style={{
                 animationDelay: `${180 + index * 70}ms`,
-                width: "18px",
-                height: "18px",
-                objectFit: "contain",
-                imageRendering: "pixelated",
                 filter: `drop-shadow(0 2px 3px rgba(0,0,0,0.5)) drop-shadow(0 0 6px ${color}44)`,
               }}
             />

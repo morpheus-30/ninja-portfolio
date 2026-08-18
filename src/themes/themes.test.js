@@ -67,6 +67,25 @@ describe.each(THEMES.map((t) => [t.id, t]))("theme %s", (id, theme) => {
     });
   });
 
+  test("every skill carries a usable colour", () => {
+    // The Naruto meter builds linear-gradient(90deg, <color>, gold) and the
+    // Gameverse heart uses <color>44, so a missing or malformed value produces
+    // an invalid declaration and the meter renders empty.
+    theme.content.skills.groups.forEach((group) => {
+      group.skills.forEach((skill) => {
+        expect(skill.color).toMatch(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+        expect(skill.label.trim()).toBe(skill.label);
+        expect(skill.value).toBeGreaterThanOrEqual(0);
+        expect(skill.value).toBeLessThanOrEqual(100);
+      });
+    });
+  });
+
+  test("group titles are unique so no two columns share a heading", () => {
+    const titles = theme.content.skills.groups.map((group) => group.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
   test("content is derived from the shared data layer, not duplicated", () => {
     expect(theme.content.projects.items).toHaveLength(portfolioData.projects.length);
     expect(theme.content.skills.groups).toHaveLength(portfolioData.skills.length);

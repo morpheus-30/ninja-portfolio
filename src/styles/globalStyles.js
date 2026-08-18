@@ -391,7 +391,12 @@ ${staggerDelays}
       gap: 0.75rem;
       margin-bottom: 0.3rem;
     }
-    .meter-label { color: ${C.text}; font-size: 0.94rem; }
+    .meter-label {
+      color: ${C.text};
+      font-size: 0.94rem;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
     .meter-value { color: ${C.gold}; font-size: 0.84rem; font-weight: 700; flex: 0 0 auto; }
     .meter-track {
       height: 7px;
@@ -407,6 +412,43 @@ ${staggerDelays}
       background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,0.6) 6px 8px);
     }
     .t-pop .meter-value { font-family: 'VT323', monospace; font-size: 1rem; }
+    /* Any number of groups: columns come from available width, not a count.
+       Groups have unequal lengths, so each ends where its content ends rather
+       than stretching to match its tallest neighbour. */
+    .skill-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15.5rem), 1fr));
+      gap: 1.2rem 2rem;
+      align-content: start;
+      width: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 0.4rem;
+    }
+    .skill-group { min-width: 0; align-self: start; }
+
+    /* A long list tightens instead of overflowing the panel. */
+    .skill-groups.is-dense { gap: 0.9rem 1.8rem; --heart-size: 14px; }
+    .skill-groups.is-dense .meter-row { padding: 0.22rem 0; }
+    .skill-groups.is-dense .meter-head { margin-bottom: 0.18rem; }
+    .skill-groups.is-dense .meter-label { font-size: 0.86rem; }
+    .skill-groups.is-dense .meter-value { font-size: 0.78rem; }
+    .skill-groups.is-dense .meter-track { height: 5px; }
+    .skill-groups.is-dense .group-heading {
+      padding-bottom: 0.32rem;
+      margin-bottom: 0.38rem;
+    }
+
+    /* Sized from a token so density can shrink the row without touching JSX. */
+    .heart {
+      width: var(--heart-size, 18px);
+      height: var(--heart-size, 18px);
+      object-fit: contain;
+      image-rendering: pixelated;
+      flex: 0 0 auto;
+    }
+
     .group-heading {
       font-size: 0.68rem;
       letter-spacing: 0.22em;

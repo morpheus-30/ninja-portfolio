@@ -31,12 +31,12 @@ export const skills = [
     "category": "Languages",
     "items": [
       {
-        "label": "Typescriot",
+        "label": "TypeScript",
         "value": 70,
         "color": "#8b4dff"
       },
       {
-        "label": "Javascript",
+        "label": "JavaScript",
         "value": 70,
         "color": "#4dff70"
       },
