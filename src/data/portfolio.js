@@ -28,72 +28,192 @@ export const bio = {
 
 export const skills = [
   {
-    "category": "Enterprise Technologies",
+    "category": "Languages",
     "items": [
       {
-        "label": "SAP ABAP",
-        "value": 85,
-        "color": "#d85a1a"
+        "label": "Typescriot",
+        "value": 70,
+        "color": "#8b4dff"
       },
       {
-        "label": "SAP BTP",
-        "value": 82,
-        "color": "#efc56c"
+        "label": "Javascript",
+        "value": 70,
+        "color": "#4dff70"
       },
       {
-        "label": "SAP RAP",
+        "label": "Python",
+        "value": 70,
+        "color": "#cf4dff"
+      },
+      {
+        "label": "C++",
         "value": 80,
-        "color": "#f3ddaf"
+        "color": "#ff4dbe"
       },
       {
-        "label": "OData Services",
-        "value": 76,
-        "color": "#9d2c12"
+        "label": "Kotlin",
+        "value": 60,
+        "color": "#4fff4d"
+      },
+      {
+        "label": "ABAP",
+        "value": 80,
+        "color": "#ff4dde"
       }
     ]
   },
   {
-    "category": "Programming Languages & Frameworks",
+    "category": "Frameworks & Libraries",
     "items": [
       {
-        "label": "Python / FastAPI",
-        "value": 84,
-        "color": "#4b8bbe"
+        "label": "React",
+        "value": 70,
+        "color": "#4f9eff"
+      },
+      {
+        "label": "Next.js",
+        "value": 60,
+        "color": "#ff4dcf"
+      },
+      {
+        "label": "Express.js",
+        "value": 75,
+        "color": "#ffac4d"
+      },
+      {
+        "label": "Flask",
+        "value": 60,
+        "color": "#4dff8b"
+      },
+      {
+        "label": "Tailwind CSS",
+        "value": 50,
+        "color": "#a64dff"
+      },
+      {
+        "label": "FastAPI",
+        "value": 75,
+        "color": "#cfff4d"
+      },
+      {
+        "label": "Prisma",
+        "value": 76,
+        "color": "#8b4dff"
       },
       {
         "label": "Flutter",
         "value": 80,
-        "color": "#4cc2ff"
+        "color": "#82ff4d"
       },
       {
-        "label": "Go",
-        "value": 30,
-        "color": "#5dc9e2"
+        "label": "Android SDK",
+        "value": 80,
+        "color": "#4ddbff"
       },
       {
-        "label": "JavaScript",
-        "value": 78,
-        "color": "#e9b949"
-      },
-      {
-        "label": "C++",
+        "label": "SAP UI5/CAP",
         "value": 70,
-        "color": "#6b8cff"
+        "color": "#ffac4d"
       },
       {
-        "label": "Next.js",
+        "label": "LangChain",
+        "value": 40,
+        "color": "#ff4d79"
+      },
+      {
+        "label": "SAP RAP",
+        "value": 75,
+        "color": "#020203"
+      }
+    ]
+  },
+  {
+    "category": "Database & APIs",
+    "items": [
+      {
+        "label": "PostgreSQL",
+        "value": 70,
+        "color": "#4d58ff"
+      },
+      {
+        "label": "Firebase",
+        "value": 79,
+        "color": "#143918"
+      },
+      {
+        "label": "SAP HANA Cloud",
         "value": 80,
-        "color": "#4f9eff"
+        "color": "#4dff4f"
       },
       {
-        "label": "Express.js",
+        "label": "REST",
+        "value": 60,
+        "color": "#d84dff"
+      },
+      {
+        "label": "OData",
+        "value": 70,
+        "color": "#ff704d"
+      },
+      {
+        "label": "WebSockets",
+        "value": 60,
+        "color": "#58ff4d"
+      },
+      {
+        "label": "JWT",
+        "value": 70,
+        "color": "#4dffd2"
+      },
+      {
+        "label": "OAuth 2.0",
+        "value": 75,
+        "color": "#ff4d70"
+      }
+    ]
+  },
+  {
+    "category": "Cloud & Tools",
+    "items": [
+      {
+        "label": "AWS",
+        "value": 45,
+        "color": "#d84dff"
+      },
+      {
+        "label": "DigitalOcean",
+        "value": 50,
+        "color": "#4dff61"
+      },
+      {
+        "label": "Docker",
+        "value": 50,
+        "color": "#ffa34d"
+      },
+      {
+        "label": "Git",
         "value": 80,
-        "color": "#4f9eff"
+        "color": "#eaff4d"
       },
       {
-        "label": "BetterAuth",
-        "value": 90,
-        "color": "#4f9eff"
+        "label": "Nginx",
+        "value": 70,
+        "color": "#4dffb2"
+      },
+      {
+        "label": "Vercel",
+        "value": 60,
+        "color": "#f34dff"
+      },
+      {
+        "label": "SAP BTP",
+        "value": 50,
+        "color": "#4dff70"
+      },
+      {
+        "label": "Chrome Extensions (Manifest V3)",
+        "value": 70,
+        "color": "#4dc9ff"
       }
     ]
   }
@@ -126,12 +246,12 @@ export const projects = [
     "title": "MyNotion",
     "description": "A multi-tenant RAG assistant that indexes a Notion workspace and answers questions over it through semantic search. Incremental sync keeps the Qdrant vector store current as pages change, so answers stay grounded in the latest content.",
     "tags": [
-        "RAG",
-        "Qdrant",
-        "Python",
-        "LLM",
-        "Streamlit"
-      ],
+      "RAG",
+      "Qdrant",
+      "Python",
+      "LLM",
+      "Streamlit"
+    ],
     "link": "https://mynotion.streamlit.app/"
   },
   {
