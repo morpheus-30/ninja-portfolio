@@ -135,6 +135,76 @@ ${staggerDelays}
     .ground-pulse { animation: groundPulse ${MOTION.runDurationMs}ms var(--ease-out) both; }
 
     /* ---------------------------------------------------------------
+       Scene backdrop. Layers crossfade; only the visible one drifts.
+       --------------------------------------------------------------- */
+    .backdrop-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-repeat: no-repeat;
+      transform: scale(1.06);
+      will-change: opacity;
+      transition: opacity 900ms var(--ease-out), background-position 900ms var(--ease-out);
+    }
+    /* Running the drift only on the active layer keeps four idle full-screen
+       layers off the compositor. */
+    .backdrop-layer.is-active { animation: ${W.backdropDrift ?? "none"}; }
+
+    @keyframes driftScroll {
+      from { transform: scale(1.06) translate3d(0, 0, 0); }
+      to   { transform: scale(1.15) translate3d(-1.6%, -1.1%, 0); }
+    }
+    @keyframes driftCabinet {
+      from { transform: scale(1.05) translate3d(0, 0, 0); }
+      to   { transform: scale(1.12) translate3d(1.4%, -0.8%, 0); }
+    }
+
+    /* Naruto: lamplight from below, breathing. */
+    .ember-breathe {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: emberBreathe 9s ease-in-out infinite alternate;
+    }
+    @keyframes emberBreathe {
+      from { opacity: 0.55; transform: translate3d(0, 1.5%, 0) scale(1); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1.06); }
+    }
+
+    /* Gameverse: a tube that never quite holds sync. */
+    .crt-roll {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 28vh;
+      pointer-events: none;
+      background: linear-gradient(
+        180deg,
+        rgba(111,247,255,0) 0%,
+        rgba(111,247,255,0.05) 42%,
+        rgba(214,252,255,0.09) 50%,
+        rgba(111,247,255,0.04) 58%,
+        rgba(111,247,255,0) 100%
+      );
+      animation: crtRoll 8.5s linear infinite;
+    }
+    @keyframes crtRoll {
+      from { transform: translateY(-30vh); }
+      to   { transform: translateY(130vh); }
+    }
+    .crt-flicker {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: crtFlicker 5.5s steps(1, end) infinite;
+    }
+    @keyframes crtFlicker {
+      0%, 42%, 47%, 100% { opacity: 1; }
+      44% { opacity: 0.93; }
+      45% { opacity: 1.02; }
+    }
+
+    /* ---------------------------------------------------------------
        Panel — the shared shell each world dresses differently.
        --------------------------------------------------------------- */
     .panel { position: relative; isolation: isolate; }
@@ -639,7 +709,8 @@ ${staggerDelays}
         transition-duration: 1ms !important;
         scroll-behavior: auto !important;
       }
-      .speed-lines, .hud-dot { display: none; }
+      .speed-lines, .hud-dot, .crt-roll, .crt-flicker { display: none; }
+      .backdrop-layer, .backdrop-layer.is-active { animation: none; }
     }
   `;
 }

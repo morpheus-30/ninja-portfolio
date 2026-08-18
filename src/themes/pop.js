@@ -93,6 +93,7 @@ export function buildPopTheme(data = defaultData) {
           "radial-gradient(130% 120% at 50% 50%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.42) 78%, rgba(0,0,0,0.72) 100%)",
         scanline:
           "repeating-linear-gradient(180deg, rgba(0,0,0,0.34) 0px, rgba(0,0,0,0.34) 1px, rgba(255,255,255,0.015) 1px, rgba(255,255,255,0.015) 3px)",
+        backdropDrift: "driftCabinet 42s ease-in-out infinite alternate",
         selectionBackground: "rgba(111, 247, 255, 0.32)",
         scrollThumb: "rgba(111, 247, 255, 0.4)",
         scrollTrack: "rgba(4, 6, 11, 0.6)",

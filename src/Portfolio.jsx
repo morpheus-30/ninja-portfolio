@@ -44,13 +44,17 @@ export default function Portfolio({ overrideData }) {
       setIsThemeLoading(true);
       setIsEnteringTheme(false);
     }, 700);
-
-    window.setTimeout(() => {
-      setSelectedThemeId(themeId);
-      setIsThemeLoading(false);
-      setPendingThemeId(null);
-    }, 2200);
+    // Entry used to fire on a blind 2200ms timer, which is why backgrounds
+    // arrived after the scene did. The loading screen now preloads the theme's
+    // images and calls handleThemeReady once they can be painted.
   }, []);
+
+  const handleThemeReady = useCallback(() => {
+    if (!pendingThemeId) return;
+    setSelectedThemeId(pendingThemeId);
+    setIsThemeLoading(false);
+    setPendingThemeId(null);
+  }, [pendingThemeId]);
 
   const handleSwitchTheme = useCallback(() => {
     setSelectedThemeId(null);
@@ -60,7 +64,9 @@ export default function Portfolio({ overrideData }) {
   }, []);
 
   if (isThemeLoading && loadingTheme) {
-    return <ThemeLoadingScreen theme={loadingTheme} />;
+    return (
+      <ThemeLoadingScreen theme={loadingTheme} onReady={handleThemeReady} />
+    );
   }
 
   if (!activeTheme) {

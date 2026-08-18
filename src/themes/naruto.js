@@ -87,6 +87,7 @@ export function buildNarutoTheme(data = defaultData) {
           "polygon(0.6% 2%, 4% 0.4%, 22% 1.6%, 48% 0%, 74% 1.4%, 96% 0.5%, 99.4% 2.4%, 100% 18%, 99.2% 46%, 100% 72%, 99.5% 96%, 96% 99.6%, 72% 98.4%, 46% 100%, 24% 98.6%, 4% 99.5%, 0.5% 97%, 0% 74%, 0.8% 48%, 0% 22%)",
         inkBleed:
           "radial-gradient(120% 60% at 0% 0%, rgba(11,6,4,0.55) 0%, rgba(11,6,4,0) 42%), radial-gradient(110% 55% at 100% 100%, rgba(11,6,4,0.5) 0%, rgba(11,6,4,0) 40%)",
+        backdropDrift: "driftScroll 34s ease-in-out infinite alternate",
         selectionBackground: "rgba(194, 65, 12, 0.42)",
         scrollThumb: "rgba(232, 181, 99, 0.34)",
         scrollTrack: "rgba(12, 8, 6, 0.5)",

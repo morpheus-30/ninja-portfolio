@@ -5,6 +5,7 @@ import { useNavigation } from "../hooks/useNavigation";
 import { useCharacterControls } from "../hooks/useCharacterControls";
 import { buildGlobalStyles } from "../styles/globalStyles";
 import ThreeScene from "./ThreeScene";
+import SceneBackdrop from "./SceneBackdrop";
 import NarutoWalker from "./NarutoWalker";
 import HomeSection from "./sections/HomeSection";
 import AboutSection from "./sections/AboutSection";
@@ -141,18 +142,7 @@ export default function PortfolioExperience({ activeTheme, onSwitchTheme }) {
     >
       <style>{buildGlobalStyles({ assets, C, MOTION, UI, W })}</style>
 
-      {/* Background image */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `${UI.backgroundImageOverlay}, url(${assets.sectionBackgrounds[displayIdx]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: UI.backgroundFilter,
-          transform: "scale(1.03)",
-        }}
-      />
+      <SceneBackdrop sectionIndex={displayIdx} />
       {/* Top atmosphere */}
       <div
         style={{
