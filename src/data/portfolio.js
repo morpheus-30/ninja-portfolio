@@ -11,7 +11,7 @@ export const profile = {
   "location": "India",
   "title": "Associate Software Engineer",
   "primarySkills": "Python, Flutter, SAP, FastAPI, JavaScript, Express",
-  "experience": "1+ Years",
+  "experience": "1.5+ Years",
   "focus": "AI AI AIIIII!",
   "hobbies": "Sketching, Guitar, Badminton, Table Tennis"
 };
